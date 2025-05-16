@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+
+.container-size {
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+}
