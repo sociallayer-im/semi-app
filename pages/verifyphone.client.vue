@@ -1,46 +1,26 @@
 <template>
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg  p-4">
-        <UButton
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            class="self-start mb-4"
-            @click="router.push('/login')"
-        >
+        <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
+            @click="router.push('/login')">
             返回
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
             <h1 class="text-2xl font-bold">验证手机号</h1>
-            <div>请输入<span class="text-primary font-semibold mx-1">{{ phone.slice(0, 3) }}...{{ phone.slice(-4) }}</span>收到的8位验证码</div>
+            <div>请输入<span class="text-primary font-semibold mx-1">{{ phone.slice(0, 3) }}...{{ phone.slice(-4)
+                    }}</span>收到的8位验证码</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
-                    <UPinInput
-                        type="number"
-                        v-model="formState.pin"
-                        :length="6"
-                        size="xl"
-                        class="w-full"
-                        :ui="{ base: 'w-full' }"
-                    />
+                    <UPinInput type="number" v-model="formState.pin" :length="6" size="xl" class="w-full"
+                        :ui="{ base: 'w-full' }" :disabled="loading" />
                 </UFormField>
                 <div class="flex justify-between items-center mt-2">
-                    <UButton
-                        type="button"
-                        color="neutral"
-                        variant="ghost"
-                        :disabled="countdown > 0"
-                        @click="resendCode"
-                    >
+                    <UButton type="button" color="neutral" variant="ghost" :disabled="countdown > 0 || loading"
+                        @click="resendCode">
                         {{ countdown > 0 ? `重新发送(${countdown})` : '重新发送验证码' }}
                     </UButton>
                 </div>
-                <UButton
-                    type="submit"
-                    color="primary"
-                    class="w-full mt-4 flex justify-center items-center"
-                    size="xl"
-                    :loading="loading"
-                >
+                <UButton type="submit" color="primary" class="w-full mt-4 flex justify-center items-center" size="xl"
+                    :loading="loading" :disabled="loading">
                     验证
                 </UButton>
             </UForm>
@@ -104,7 +84,7 @@ const formState = reactive({
 const validatePin = (value: string[]) => {
     const pin = value.join('')
     if (!pin) return '请输入验证码'
-    if (!/^\d{8}$/.test(pin)) return '请输入8位数字验证码'
+    if (!/^\d{6}$/.test(pin)) return '请输入8位数字验证码'
     return true
 }
 
@@ -113,9 +93,30 @@ const onSubmit = async () => {
     try {
         const validation = validatePin(formState.pin)
         if (validation === true) {
-            // TODO: 在这里添加验证码验证逻辑
-            await router.push('/dashboard')
+            const response = await semiAPI.signIn(phone.value, formState.pin.join(''))
+            if (response.result === 'ok') {
+                toast.add({
+                    title: '验证成功',
+                    description: '正在跳转到首页',
+                    color: 'success'
+                })
+
+                await router.push('/dashboard')
+            }
+        } else {
+            toast.add({
+                title: '请输入正确的验证码',
+                description: validation,
+                color: 'error'
+            })
         }
+    } catch (error) {
+        console.error('验证失败:', error)
+        toast.add({
+            title: '验证失败',
+            description: '请检查验证码是否正确',
+            color: 'error'
+        })
     } finally {
         loading.value = false
     }
