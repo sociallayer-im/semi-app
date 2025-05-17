@@ -30,13 +30,15 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-
+import { sendSMS, signIn, getUser } from '~/utils/semi_api'
+import { useUserStore } from '~/stores/user'
 const router = useRouter()
 const route = useRoute()
 const phone = computed(() => route.query.phone as string || '')
 const loading = ref(false)
 const countdown = ref(60)
 const toast = useToast()
+const userStore = useUserStore()
 
 const startCountdown = () => {
     countdown.value = 60
@@ -52,7 +54,7 @@ const resendCode = async () => {
     if (countdown.value > 0) return
     loading.value = true
     try {
-        const response = await semiAPI.sendSMS(phone.value)
+        const response = await sendSMS(phone.value)
         if (response.result === 'ok') {
             toast.add({
                 title: '发送成功',
@@ -93,7 +95,7 @@ const onSubmit = async () => {
     try {
         const validation = validatePin(formState.pin)
         if (validation === true) {
-            const response = await semiAPI.signIn(phone.value, formState.pin.join(''))
+            const response = await signIn(phone.value, formState.pin.join(''))
             if (response.result === 'ok') {
                 toast.add({
                     title: '验证成功',
@@ -101,7 +103,11 @@ const onSubmit = async () => {
                     color: 'success'
                 })
 
-                await router.push('/dashboard')
+                const user = await getUser(response.id)
+                console.log('[user]:', user)
+
+                userStore.setUser(user)
+                await router.push('/')
             }
         } else {
             toast.add({

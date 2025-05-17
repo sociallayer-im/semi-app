@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { semiAPI } from '~/utils/semi_api'
+import { sendSMS } from '~/utils/semi_api'
 
 const router = useRouter()
 const loading = ref(false)
@@ -60,7 +60,7 @@ const onSubmit = async () => {
     try {
         const validation = validatePhone(formState.phone)
         if (validation === true) {
-            const response = await semiAPI.sendSMS(formState.phone)
+            const response = await sendSMS(formState.phone)
             if (response.result === 'ok') {
                 await router.push(`/verifyphone?phone=${formState.phone}`)
             }

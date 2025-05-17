@@ -5,6 +5,6 @@ export default defineNuxtConfig({
   ui: {
     fonts: false
   },
-  modules: ['@nuxt/icon', '@nuxt/ui'],
+  modules: ['@nuxt/icon', '@nuxt/ui', '@pinia/nuxt'],
   css: ['~/assets/css/main.css']
 })
