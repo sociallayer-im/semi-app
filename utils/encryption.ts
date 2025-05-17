@@ -15,7 +15,7 @@ function base64ToUint8Array(base64: string) {
   return Uint8Array.from(binary, c => c.charCodeAt(0))
 }
 // Helper: hex encode Uint8Array
-function toHex(uint8: Uint8Array) {
+export const toHex = function (uint8: Uint8Array) {
   return Array.from(uint8).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 // Helper: hex decode to Uint8Array
@@ -130,4 +130,9 @@ export function getAddressFromMnemonic(mnemonic: string) {
 export async function signTransaction(mnemonic: string, tx: any) {
   const account = mnemonicToAccount(mnemonic)
   return account.signTransaction(tx)
+}
+
+export function mnemonicToPrivateKey(mnemonic: string) {
+  const account = mnemonicToAccount(mnemonic)
+  return '0x' + toHex(account.getHdKey().privateKey as any)
 }

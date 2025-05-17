@@ -6,8 +6,11 @@ export const useUserStore = defineStore('user', {
         user: null as UserInfo | null,
     }),
     actions: {
-        async getUser() {
-            if (this.user) return this.user
+        async getUser(force = false) {
+            if (this.user && !force)  {
+                return this.user
+            }
+            
             if (getCookie(AUTH_TOKEN_KEY)) {
               const user = await getMe()
               this.user = user

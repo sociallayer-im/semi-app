@@ -169,11 +169,19 @@ export async function setImageUrl(id: string, image_url: string): Promise<BaseRe
 }
 
 // 6. 设置加密密钥
-export async function setEncryptedKeys(id: string, encrypted_keys: string): Promise<BaseResponse> {
+
+export interface SetEncryptedKeysProps  {
+    id: string;
+    encrypted_keys: string;
+    evm_chain_address: string;
+    evm_chain_active_key: string;
+}
+
+export async function setEncryptedKeys(props: SetEncryptedKeysProps): Promise<BaseResponse> {
     const response = await fetch(`${API_BASE_URL}/set_encrypted_keys`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ id, encrypted_keys }),
+        body: JSON.stringify(props),
     });
     return handleRequest<BaseResponse>(response);
 }

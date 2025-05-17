@@ -1,7 +1,7 @@
 import type { Address } from "viem"
 
 interface Deployment {
-    [key: string]: {
+    [key: number]: {
         compatibility_fallback_handler: Address
         create_call: Address
         multi_send: Address
@@ -20,14 +20,15 @@ interface Deployment {
 }
 
 export interface BundlerUrl {
-    [key: string]: string
+    [key: number]: string
 }
 
-export const SUPPORTED_CHAINS = ['optimism'] as const
+export const SUPPORTED_CHAINS = [10] as const
 
 
 export const V1_4_1_DEPLOYMENTS: Deployment = {
-    optimism: {
+    // optimism
+    10: {
         compatibility_fallback_handler: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
         create_call: '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
         multi_send: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
@@ -46,5 +47,5 @@ export const V1_4_1_DEPLOYMENTS: Deployment = {
 }
 
 export const BUNDLER_URL: BundlerUrl = {
-    optimism: 'https://api.pimlico.io/v2/10/rpc?apikey=pim_dVy1p9xLiFbUKzuRt91SSz'
+    10: 'https://api.pimlico.io/v2/10/rpc?apikey=pim_dVy1p9xLiFbUKzuRt91SSz'
 }

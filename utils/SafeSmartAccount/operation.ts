@@ -1,6 +1,7 @@
 import type { Address, Chain } from "viem"
 
-import { getSafeSmartAccount, prepareClient } from "./utils"
+import { prepareClient } from "./utils/prepareClient"
+import { getSafeAccount } from "./account"
 import { erc20Abi, parseEther } from "viem"
 
 
@@ -13,7 +14,7 @@ export interface TransferOptions {
 }
 
 export const transfer = async ({ to, amount, privateKey, chain }: TransferOptions) => {
-    const smartAccount = await getSafeSmartAccount(privateKey, chain)
+    const smartAccount = await getSafeAccount(privateKey, chain)
 
     const { bundlerClient } = await prepareClient(chain)
 
@@ -50,7 +51,7 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
         throw new Error('erc20TokenAddress is required')
     }
 
-    const smartAccount = await getSafeSmartAccount(privateKey, chain)
+    const smartAccount = await getSafeAccount(privateKey, chain)
 
     const { publicClient, bundlerClient } = await prepareClient(chain)
 

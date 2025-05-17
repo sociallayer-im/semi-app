@@ -53,8 +53,10 @@
 </template>
 
 <script setup lang="ts">
+import { optimism } from 'viem/chains'
 import { useUserStore } from '~/stores/user'
 import { generateMnemonicPhrase, getAddressFromMnemonic, encryptMnemonicToKeystore } from '~/utils/encryption'
+import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { setEncryptedKeys } from '~/utils/semi_api'
 
 const router = useRouter()
@@ -67,7 +69,7 @@ const firstPin = ref('')
 onMounted(async () => {
     if (!userStore.user) {
             router.push('/')
-        }
+    }
 })
 
 const formState = reactive({
@@ -86,14 +88,26 @@ const createManagerWallet = async (pin: string) => {
 
         // 第一步：生成助记词和钱包地址
         const mnemonic = generateMnemonicPhrase()
-        const address = getAddressFromMnemonic(mnemonic)
-        console.log('Generated wallet address:', address)
+        const evm_chain_active_key = getAddressFromMnemonic(mnemonic)
+
+        // 第二步：生成EVM链地址
+        const evm_chain_address = await predictSafeAccountAddress({
+            owner: evm_chain_active_key,
+            chain: optimism,
+        })
 
         // 第二步：使用pin加密助记词
         const encrypted_keys = await encryptMnemonicToKeystore(mnemonic, pin)
+
         
         // 第三步：上传加密后的密钥
-        const response = await setEncryptedKeys(userStore.user.id, JSON.stringify(encrypted_keys))
+        const response = await setEncryptedKeys({
+            id: userStore.user.id,
+            encrypted_keys: JSON.stringify(encrypted_keys),
+            evm_chain_active_key,
+            evm_chain_address,
+        })
+        
         if (response.result === 'ok') {
             toast.add({
                 title: '设置成功',
@@ -102,7 +116,7 @@ const createManagerWallet = async (pin: string) => {
             })
 
             // 更新用户信息
-            await userStore.getUser()
+            await userStore.getUser(true)
             router.push('/')
         } else {
             throw new Error('设置失败')
