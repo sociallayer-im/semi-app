@@ -15,6 +15,7 @@ export interface UserInfo {
     evm_chain_active_key?: string | null;
     remaining_gas_credits?: number;
     total_used_gas_credits?: number;
+    encrypted_keys?: string | null;
 }
 
 // 登录响应接口
