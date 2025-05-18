@@ -56,12 +56,12 @@
                 <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
                     class="w-10 h-10 rounded-full" alt="opUSDT" />
                 <div>
-                    <div class="font-medium">CKB</div>
-                    <div class="text-gray-400 text-sm">opUSDT</div>
+                    <div class="font-medium">{{ useChain.chain.nativeCurrency.symbol }}</div>
+                    <div class="text-gray-400 text-sm">{{ useChain.chain.name }}</div>
                 </div>
             </div>
             <div class="flex flex-col items-end">
-                <span class="font-medium">0</span>
+                <span class="font-medium">{{ displayBalance(data.balance) }}</span>
             </div>
         </div>
     </div>
