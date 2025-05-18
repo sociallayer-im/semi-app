@@ -14,6 +14,7 @@
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
                     <UPinInput
+                        variant="subtle"
                         type="number"
                         v-model="formState.pin"
                         :length="6"

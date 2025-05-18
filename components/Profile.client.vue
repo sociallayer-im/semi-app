@@ -53,7 +53,7 @@
         <!-- 资产列表 -->
         <div class="w-full flex items-center justify-between mt-2">
             <div class="flex items-center gap-3">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
+                <img src="/images/eth_logo.png"
                     class="w-10 h-10 rounded-full" alt="opUSDT" />
                 <div>
                     <div class="font-medium">{{ useChain.chain.nativeCurrency.symbol }}</div>

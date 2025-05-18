@@ -10,7 +10,7 @@
                     }}</span>收到的8位验证码</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
-                    <UPinInput type="number" v-model="formState.pin" :length="6" size="xl" class="w-full"
+                    <UPinInput variant="subtle" type="number" v-model="formState.pin" :length="6" size="xl" class="w-full"
                         :ui="{ base: 'w-full' }" :disabled="loading" />
                 </UFormField>
                 <div class="flex justify-between items-center mt-2">

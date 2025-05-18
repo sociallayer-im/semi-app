@@ -21,6 +21,7 @@
                         placeholder="请输入手机号"
                         :ui="{ base: 'w-full' }"
                         :disabled="loading"
+                        variant="subtle"
                     />
                 </UFormField>
                 <UButton

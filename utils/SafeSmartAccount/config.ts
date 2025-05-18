@@ -43,6 +43,7 @@ export const V1_4_1_DEPLOYMENTS: Deployment = {
         safe_4337_module: '0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226',
         add_module_lib: '0x8EcD4ec46D4D2a6B64fE960B3D64e8B94B2234eb',
     },
+    
     // sepolia
     11155111: {
         compatibility_fallback_handler: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
@@ -63,6 +64,6 @@ export const V1_4_1_DEPLOYMENTS: Deployment = {
 }
 
 export const BUNDLER_URL: BundlerUrl = {
-    10: 'https://api.pimlico.io/v2/10/rpc?apikey=pim_dVy1p9xLiFbUKzuRt91SSz',
-    11155111: 'https://rpc.zerodev.app/api/v3/fa3a212f-ff03-4103-a0fd-6679fa7b6f1d/chain/11155111?selfFunded=true'
+    10: process.env.OP_BUNDLER_URL!,
+    11155111: process.env.SEPOLIA_BUNDLER_URL!,
 }

@@ -12,12 +12,12 @@
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="to" label="接收地址">
-                        <UInput size="xl" class="w-full" v-model="formState.to" placeholder="请输入接收地址"
+                        <UInput size="xl" class="w-full" variant="subtle" v-model="formState.to" placeholder="请输入接收地址"
                             :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                     </UFormField>
 
                     <UFormField name="amount" label="发送数量" class="mt-4">
-                        <UInput size="xl" class="w-full" v-model="formState.amount" placeholder="请输入发送数量"
+                        <UInput variant="subtle" size="xl" class="w-full" v-model="formState.amount" placeholder="请输入发送数量"
                             :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                     </UFormField>
 
@@ -44,7 +44,7 @@
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="code">
-                        <UPinInput type="number" v-model="formState.code" :length="6" size="xl" class="w-full"
+                        <UPinInput variant="subtle" type="number" v-model="formState.code" :length="6" size="xl" class="w-full"
                             :ui="{ base: 'w-full' }" :disabled="loading" mask />
                     </UFormField>
 
