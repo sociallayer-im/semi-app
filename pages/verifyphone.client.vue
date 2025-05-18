@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { sendSMS, signIn, getUser } from '~/utils/semi_api'
+import { sendSMS, signIn } from '~/utils/semi_api'
 import { useUserStore } from '~/stores/user'
 const router = useRouter()
 const route = useRoute()

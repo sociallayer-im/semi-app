@@ -53,14 +53,15 @@
 </template>
 
 <script setup lang="ts">
-import { optimism } from 'viem/chains'
 import { useUserStore } from '~/stores/user'
+import { useChainStore } from '~/stores/chain'
 import { generateMnemonicPhrase, getAddressFromMnemonic, encryptMnemonicToKeystore } from '~/utils/encryption'
 import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { setEncryptedKeys } from '~/utils/semi_api'
 
 const router = useRouter()
 const userStore = useUserStore()
+const useChain = useChainStore()
 const loading = ref(false)
 const toast = useToast()
 const step = ref(1)
@@ -93,7 +94,7 @@ const createManagerWallet = async (pin: string) => {
         // 第二步：生成EVM链地址
         const evm_chain_address = await predictSafeAccountAddress({
             owner: evm_chain_active_key,
-            chain: optimism,
+            chain: useChain.chain,
         })
 
         // 第二步：使用pin加密助记词

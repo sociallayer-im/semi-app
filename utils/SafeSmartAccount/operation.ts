@@ -33,10 +33,6 @@ export const transfer = async ({ to, amount, privateKey, chain }: TransferOption
     const hash = await bundlerClient.sendUserOperation({
         account: smartAccount,
         calls: [tx],
-        maxFeePerGas: gas.callGasLimit,
-        maxPriorityFeePerGas: gas.preVerificationGas,
-        preVerificationGas: gas.preVerificationGas,
-        verificationGasLimit: gas.verificationGasLimit,
     })
 
     console.log('[userOperation hash]:', hash)
