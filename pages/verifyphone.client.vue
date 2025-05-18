@@ -32,6 +32,11 @@
 import { onMounted } from 'vue'
 import { sendSMS, signIn } from '~/utils/semi_api'
 import { useUserStore } from '~/stores/user'
+
+definePageMeta({
+    layout: 'unauth'
+})
+
 const router = useRouter()
 const route = useRoute()
 const phone = computed(() => route.query.phone as string || '')

@@ -8,7 +8,7 @@
                 {
                     label: '退出登录',
                     icon: 'ci:logout',
-                    click: handleLogout
+                    onSelect: handleLogout
                 }
             ]">
                 <UIcon name="ci:settings" size="24" class="cursor-pointer hover:text-primary-500" />
@@ -68,22 +68,16 @@
 </template>
 
 <script setup lang="ts">
-import type { UserInfo } from '~/utils/semi_api'
 import { getBalance } from '~/utils/balance'
-import { formatEther } from 'viem'
-import { useAuthStore } from '../stores/auth'
+import { useUserStore } from '../stores/user'
 import { useChainStore } from '../stores/chain'
-import { predictSafeAccountAddress, getSafeAccount } from '~/utils/SafeSmartAccount'
-import { getAddressFromMnemonic, mnemonicToPrivateKey, decryptKeystoreToMnemonic } from '~/utils/encryption'
+import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
 
-const props = defineProps<{
-    user: UserInfo
-}>()
-
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
 const loading = ref(false)
 const toast = useToast()
-const authStore = useAuthStore()
 const useChain = useChainStore()
 
 const data = reactive({
@@ -92,9 +86,8 @@ const data = reactive({
 })
 
 const handleLogout = async () => {
-    alert('logout')
     try {
-        await authStore.logout()
+        await userStore.signout()
         toast.add({
             title: '退出成功',
             description: '您已成功退出登录',
@@ -114,9 +107,8 @@ onMounted(async () => {
     try {
         loading.value = true
         
-
         const predictSafeAddress = await predictSafeAccountAddress({
-            owner: props.user.evm_chain_active_key as `0x${string}`,
+            owner: user.value?.evm_chain_active_key as `0x${string}`,
             chain: useChain.chain
         })
 

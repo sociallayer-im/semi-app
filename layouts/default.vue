@@ -8,7 +8,7 @@ const router = useRouter()
 onMounted(async () => {
     try {
         await userStore.getUser()
-        if (!user.value.encrypted_keys) {
+        if (!!user.value && !user.value.encrypted_keys) {
             router.replace('/paymentcode')
             return
         }

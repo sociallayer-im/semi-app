@@ -41,6 +41,10 @@
 <script setup lang="ts">
 import { sendSMS } from '~/utils/semi_api'
 
+definePageMeta({
+    layout: 'unauth'
+})
+
 const router = useRouter()
 const loading = ref(false)
 const toast = useToast()
