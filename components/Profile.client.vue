@@ -4,15 +4,7 @@
         <div class="w-full flex items-center justify-between mb-4">
             <AddressDisplay
                 :address="data.safeAddress" />
-            <UDropdownMenu :items="[
-                {
-                    label: '退出登录',
-                    icon: 'ci:logout',
-                    onSelect: handleLogout
-                }
-            ]">
-                <UIcon name="ci:settings" size="24" class="cursor-pointer hover:text-primary-500" />
-            </UDropdownMenu>
+            <ProfileSettings />
         </div>
 
         <!-- 资产总览 -->
@@ -71,7 +63,6 @@
 import { getBalance } from '~/utils/balance'
 import { useUserStore } from '../stores/user'
 import { useChainStore } from '../stores/chain'
-import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
 
 const userStore = useUserStore()
@@ -85,33 +76,9 @@ const data = reactive({
     balance: BigInt(0)
 })
 
-const handleLogout = async () => {
-    try {
-        await userStore.signout()
-        toast.add({
-            title: '退出成功',
-            description: '您已成功退出登录',
-            color: 'success'
-        })
-    } catch (error) {
-        console.error(error)
-        toast.add({
-            title: '退出失败',
-            description: '请稍后再试',
-            color: 'error'
-        })
-    }
-}
-
 onMounted(async () => {
     try {
         loading.value = true
-
-        // const predictSafeAddress = await predictSafeAccountAddress({
-        //     owner: user.value?.evm_chain_active_key as `0x${string}`,
-        //     chain: useChain.chain
-        // })
-
         data.safeAddress = user.value?.evm_chain_address as string
         data.balance = (await getBalance(user.value?.evm_chain_address as `0x${string}`, useChain.chain))
     } catch (error) {

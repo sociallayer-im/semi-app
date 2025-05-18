@@ -5,7 +5,7 @@
 <template>
     <UApp>
         <div
-            class="min-h-screen w-full flex p-4 flex-col justify-center items-center relative layout-bg bg-elevated bg-center">
+            class="min-h-[100svh] w-full flex p-4 flex-col justify-center items-center relative layout-bg bg-elevated bg-center">
             <slot />
         </div>
     </UApp>
