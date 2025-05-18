@@ -27,13 +27,13 @@
             </div>
             <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/send')">
                 <div class="bg-purple-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
-                    <UIcon name="ci:external-link" size="24" class="text-primary-500" />
+                    <UIcon name="ci:external-link" size="24" class="text-purple-500" />
                 </div>
                 <span class="text-sm mt-1">发送</span>
             </div>
             <div class="flex flex-col items-center cursor-pointer">
                 <div class="bg-yellow-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
-                    <UIcon name="ci:notebook" size="24" class="text-primary-500" />
+                    <UIcon name="ci:notebook" size="24" class="text-orange-500" />
                 </div>
                 <span class="text-sm mt-1">活动</span>
             </div>

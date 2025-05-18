@@ -63,7 +63,9 @@ export const V1_4_1_DEPLOYMENTS: Deployment = {
     }
 }
 
+console.log('import.meta.env.NUXT_PUBLIC_OP_BUNDLER_URL', import.meta.env.VITE_OP_BUNDLER_URL)
+
 export const BUNDLER_URL: BundlerUrl = {
-    10: process.env.OP_BUNDLER_URL!,
-    11155111: process.env.SEPOLIA_BUNDLER_URL!,
+    10: import.meta.env.VITE_OP_BUNDLER_URL!,
+    11155111: import.meta.env.VITE_SEPOLIA_BUNDLER_URL!,
 }
