@@ -47,13 +47,16 @@ const data = reactive({
     safeAddress: ''
 })
 
+const userStore = useUserStore()
+const user = computed(() => userStore.user)
+
 onMounted(async () => {
     try {
-        const predictSafeAddress = await predictSafeAccountAddress({
-            owner: '0x6AEF77e177547551476bB8950359F1EB0AC4488f' as `0x${string}`,
-            chain: useChain.chain
-        })
-        data.safeAddress = predictSafeAddress
+        // const predictSafeAddress = await predictSafeAccountAddress({
+        //     owner: '0x6AEF77e177547551476bB8950359F1EB0AC4488f' as `0x${string}`,
+        //     chain: useChain.chain
+        // })
+        data.safeAddress = user.value?.evm_chain_address as string
     } catch (error) {
         console.error(error)
         toast.add({

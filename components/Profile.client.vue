@@ -107,13 +107,13 @@ onMounted(async () => {
     try {
         loading.value = true
         
-        const predictSafeAddress = await predictSafeAccountAddress({
-            owner: user.value?.evm_chain_active_key as `0x${string}`,
-            chain: useChain.chain
-        })
+        // const predictSafeAddress = await predictSafeAccountAddress({
+        //     owner: user.value?.evm_chain_active_key as `0x${string}`,
+        //     chain: useChain.chain
+        // })
 
-        data.safeAddress = predictSafeAddress
-        data.balance = (await getBalance(predictSafeAddress, useChain.chain))
+        data.safeAddress = user.value?.evm_chain_address as string
+        data.balance = (await getBalance(user.value?.evm_chain_address as `0x${string}`, useChain.chain))
     } catch (error) {
         console.error(error)
         toast.add({
