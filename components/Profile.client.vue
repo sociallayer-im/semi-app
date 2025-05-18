@@ -54,10 +54,10 @@
         <div class="w-full flex items-center justify-between mt-2">
             <div class="flex items-center gap-3">
                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMJSURBVHgB5ZuBcdowGEZfcxmADaoNwggeoRuEDegGOBMkGzgjZILQDUoXqGGBwARR/RfnziW2wZJ/Sabv7oMLdyjSsy3JSP6CPqZKVmVe5Wv996x+b7Ktcqjff1XZ1NkyQbIqT1XKKtYzUkZRl5k0clRXVfb4N7pPxj2fz56ohGj4afb1/zREZknYhnedEcExVdbEa3ibCEMgYh/1vsviO8o8AjbxrFCiAOxEUjAyPwE7sawZiQKwE02BJyuIUvEx84gjS8BeSQaPDoY0hzrX7Bk4TyghaoU1suZCFhC9slo5eykYBh791WqlVuEsy+w5BpYpl8KsT8DgmZ6gJUFBgCTvarzBoeP7QEOCkoDOs2DhUskmY0tQEtB5FpS+AsaWoChgf9r4zLWSbYwlQVGA5eQ3xucxBYwlQVnAU1NAObaAMSQoCyg/Gm98KnkOHwnKAmzddr5pCvCREEDA4objio0qeZ5TSSBB5iLgjgAkKsHIi9fPXUMZcjkEuASk7X63vi5cKiGAgPIW5QWFl5cXDofDP58ZY5jP52w2GyJj5MXL4jnkKLqWHeAMsDf859ySAHI5LJfLT5/PZjO0EQFbIi8zS1+w2+1iDJNbeVEdBof0AdVcwQ7Fp+7S9hsS2oMjk6WHhwcCshMBOxIisISNCIg+GJ8SUMLfmaAhkT4Ahz7Bp+40Ov8yRQGXSPAou6TBU6oCzknwKLdoCshSFtAnwaPMjBOcVoNDCeiS4FjWb1rIUxfQJsGxnPs2ATM8lsZCCTiV4PD93r0C+RQENCU4fDdvNvj0blBGA7kt078N80QmSw6UHBeBepFNBPZKc8+FrCF6ZcdOa8/fheG6Nkm94fCbxzVdCs6bqJ2nyAklx5NnwE40BSMxxc3Sr4zMM2AnkgIlcsAmnHc8NkdfivSoKQ6RbwR4ZOYDQzr7ieWovxJpbWNBXBFBj3oXhuN8IeRlIQ3PSeymzaB7RsipnmTD28g4Dps+Mt7ryE3MI0oPT39BH8NxI5bkjv7H5/f1u6xWySP0P1BeuvsD+qrw3Ldke40AAAAASUVORK5CYII="
-                    class="w-10 h-10 rounded-full" alt="CKB" />
+                    class="w-10 h-10 rounded-full" alt="opUSDT" />
                 <div>
                     <div class="font-medium">CKB</div>
-                    <div class="text-gray-400 text-sm">Nervos CKB</div>
+                    <div class="text-gray-400 text-sm">opUSDT</div>
                 </div>
             </div>
             <div class="flex flex-col items-end">
@@ -106,7 +106,7 @@ const handleLogout = async () => {
 onMounted(async () => {
     try {
         loading.value = true
-        
+
         // const predictSafeAddress = await predictSafeAccountAddress({
         //     owner: user.value?.evm_chain_active_key as `0x${string}`,
         //     chain: useChain.chain

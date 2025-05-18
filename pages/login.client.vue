@@ -11,7 +11,7 @@
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
             <h1 class="text-2xl font-bold">登录</h1>
-            <div>输入登陆手机号</div>
+            <div>输入登录手机号</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="phone">
                     <UInput
