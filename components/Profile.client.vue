@@ -2,11 +2,8 @@
     <div class="flex flex-col container-size h-[100vh] rounded-xl bg-[var(--ui-bg)] shadow-lg px-4 sm:px-8 py-8 banner">
         <!-- 顶部账户信息 -->
         <div class="w-full flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2 bg-accented rounded-full px-4 py-2">
-                <img src="https://avatars.githubusercontent.com/u/1?v=4"
-                    class="w-7 h-7 rounded-full border-2 border-green-400" alt="avatar" />
-                <span class="font-medium">Account#6b2f</span>
-            </div>
+            <AddressDisplay :image-url="'https://avatars.githubusercontent.com/u/1?v=4'"
+                :address="data.safeAddress" />
             <UIcon name="ci:settings" size="24" class="cursor-pointer hover:text-primary-500" />
         </div>
 
@@ -15,7 +12,7 @@
             <div>
                 <div class="text-gray-400 text-sm">余额</div>
                 <div class="flex items-center gap-2">
-                    <span class="text-3xl font-bold">0.00 ETH</span>
+                    <span class="text-3xl font-bold">{{ formatEther(data.balance) }} {{ optimism.nativeCurrency.symbol }}</span>
                 </div>
             </div>
         </div>
@@ -64,34 +61,41 @@
 
 <script setup lang="ts">
 import type { UserInfo } from '~/utils/semi_api'
-import { predictSafeAccountAddress, getSafeAccount } from '~/utils/SafeSmartAccount'
+import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { optimism } from 'viem/chains'
-import { mnemonicToAccount } from 'viem/accounts'
-import { toHex } from 'viem'
-import { mnemonicToPrivateKey } from '~/utils/encryption'
+import { getBalance } from '~/utils/balance'
+import { formatEther } from 'viem'
 
 const props = defineProps<{
     user: UserInfo
 }>()
 
+const loading = ref(false)
+const toast = useToast()
+const data = reactive({
+    safeAddress: '',
+    balance: BigInt(0)
+})
+
 onMounted(async () => {
     try {
-        const mnemonic = await decryptKeystoreToMnemonic(JSON.parse(props.user.encrypted_keys!), '111111')
-        const privateKey = mnemonicToPrivateKey(mnemonic)
-    
-        
-        const account  = mnemonicToAccount(mnemonic)
-       
-        const safeSmartAccount = await getSafeAccount(privateKey as `0x${string}`, optimism)
-
-        const safeAccountAddress = await predictSafeAccountAddress({
-            owner: account.address,
+        loading.value = true
+        const _safeAddress = await predictSafeAccountAddress({
+            owner: props.user.evm_chain_address as `0x${string}`,
             chain: optimism,
         })
-      
-        console.log('[wallet info]', {account, safeSmartAccount, safeAccountAddress})
+        
+        data.safeAddress = _safeAddress
+        data.balance = (await getBalance(_safeAddress, optimism))
     } catch (error) {
         console.error(error)
+        toast.add({
+            title: '获取数据失败',
+            description: '请稍后再试',
+            color: 'error'
+        })
+    } finally {
+        loading.value = false
     }
 })
 </script>
