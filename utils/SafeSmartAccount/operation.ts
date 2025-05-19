@@ -3,6 +3,7 @@ import type { Address, Chain } from "viem"
 import { prepareClient } from "./utils/prepareClient"
 import { getSafeAccount } from "./account"
 import { erc20Abi, parseEther } from "viem"
+import { BUNDLER_URL } from "./config"
 
 
 export interface TransferOptions {
@@ -30,10 +31,24 @@ export const transfer = async ({ to, amount, privateKey, chain }: TransferOption
 
     console.log('[gas]:', gas)
 
-    const hash = await bundlerClient.sendUserOperation({
+    let params: any = {
         account: smartAccount,
         calls: [tx],
-    })
+    }
+
+    if (chain.id === 10) {
+        const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
+        console.log('[gasPrice]:', gasPrice)
+        params = {
+            ...params,
+            maxFeePerGas: gasPrice.maxFeePerGas,
+            maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+            preVerificationGas: gas.preVerificationGas,
+            verificationGasLimit: gas.verificationGasLimit,
+        }
+    }
+
+    const hash = await bundlerClient.sendUserOperation(params)
 
     console.log('[userOperation hash]:', hash)
 
@@ -50,7 +65,6 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
     const smartAccount = await getSafeAccount(privateKey, chain)
 
     const { publicClient, bundlerClient } = await prepareClient(chain)
-
 
     const decimals = await publicClient.readContract({
         address: erc20TokenAddress,
@@ -74,10 +88,24 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
 
     console.log('[gas]:', gas)
 
-    const hash = await bundlerClient.sendUserOperation({
+    let params: any = {
         account: smartAccount,
         calls: [tx],
-    })
+    }
+
+    if (chain.id === 10) {
+        const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
+        console.log('[gasPrice]:', gasPrice)
+        params = {
+            ...params,
+            maxFeePerGas: gasPrice.maxFeePerGas,
+            maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+            preVerificationGas: gas.preVerificationGas,
+            verificationGasLimit: gas.verificationGasLimit,
+        }
+    }
+
+    const hash = await bundlerClient.sendUserOperation(params)
 
     console.log('[userOperation hash]:', hash)
 
@@ -86,4 +114,28 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
     console.log('[userOperation receipt]:', receipt)
 
     return receipt
+}
+
+export const pimlicoGetUserOperationGasPrice = async (chain: Chain) => {
+    const response = await fetch(`${BUNDLER_URL[chain.id]}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "jsonrpc": "2.0",
+            "method": "pimlico_getUserOperationGasPrice",
+            "params": [],
+            "id": 1
+        })
+    })
+
+    const data = await response.json()
+
+    console.log('[pimlicoGetUserOperationGasPrice]:', data)
+
+    return {
+        maxFeePerGas: BigInt(data.result.standard.maxFeePerGas),
+        maxPriorityFeePerGas: BigInt(data.result.standard.maxPriorityFeePerGas),
+    }
 }

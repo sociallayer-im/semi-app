@@ -7,6 +7,10 @@
 
         <h1 class="text-2xl font-bold">活动记录</h1>
 
+        <div class="flex flex-col gap-4 mt-4" v-if="actions.length === 0 && !loading">
+            <div class="text-gray-400 text-sm">当前没有数据</div>
+        </div>
+
         <!-- 加载动画 -->
         <div class="flex flex-col gap-4 mt-4" v-if="loading">
             <div class="w-full h-10 rounded-lg loading-bg"></div>
@@ -79,7 +83,7 @@ onMounted(async () => {
     }
 
     if (user.value?.evm_chain_address) {
-        updateRecipients(useChain.chain, user.value?.evm_chain_address!)
+       updateRecipients(useChain.chain, user.value?.evm_chain_address!)
     }
 })
 </script>

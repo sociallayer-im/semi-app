@@ -69,7 +69,7 @@
             </div>
 
             <!-- 代币资产 -->
-            <div class="w-full flex items-center justify-between mt-2 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
+            <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
                 v-for="balance in balances"
                 @click="navigateTo(`/senderc20/${balance.token.address}`)"
                 :key="balance.token.address">
