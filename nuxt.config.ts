@@ -7,4 +7,12 @@ export default defineNuxtConfig({
   },
   modules: ['@nuxt/icon', '@nuxt/ui', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      title: 'Semi', // default fallback title
+      htmlAttrs: {
+        lang: 'zh-CN',
+      }
+    }
+  }
 })
