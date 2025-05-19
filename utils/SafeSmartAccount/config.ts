@@ -23,6 +23,10 @@ export interface BundlerUrl {
     [key: number]: string
 }
 
+export interface RPCUrl {
+    [key: number]: string
+}
+
 export const SUPPORTED_CHAINS = [10] as const
 
 export const V1_4_1_DEPLOYMENTS: Deployment = {
@@ -68,4 +72,9 @@ console.log('import.meta.env.NUXT_PUBLIC_OP_BUNDLER_URL', import.meta.env.VITE_O
 export const BUNDLER_URL: BundlerUrl = {
     10: import.meta.env.VITE_OP_BUNDLER_URL!,
     11155111: import.meta.env.VITE_SEPOLIA_BUNDLER_URL!,
+}
+
+export const RPC_URL: RPCUrl = {
+    10: `${import.meta.env.VITE_OP_RPC_URL!}/${import.meta.env.VITE_INFURA_API_KEY!}`,
+    11155111: `${import.meta.env.VITE_SEPOLIA_RPC_URL!}/${import.meta.env.VITE_INFURA_API_KEY!}`,
 }

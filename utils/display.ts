@@ -11,10 +11,8 @@ export function formatAddress(address: string) {
 
 export function displayBalance(wei: bigint, fixed=4, decimals=18) {
     const value = formatUnits(wei, decimals)
-    console.log('value', value)
     const str =  new bignumber(value).toFormat(fixed, 1)
     // remove trailing zeros
-    console.log('str', str)
     return str.replace(/\.?0+$/, '')
 }
 
@@ -28,6 +26,8 @@ export interface ActionPreview {
     token: string | 'NATIVE_COIN'
     type: string
     txHex: string
+    symbol?: string
+    decimals?: number
 }
 
 export function parseActions(history: any[]) {
@@ -46,6 +46,8 @@ export function parseActions(history: any[]) {
             token: item.transaction.txInfo.transferInfo.type,
             type: item.transaction.txInfo.type,
             txHex: item.transaction.txHash,
+            symbol: item.transaction.txInfo.transferInfo.tokenSymbol,
+            decimals: item.transaction.txInfo.transferInfo.decimals,
         })
     })
 

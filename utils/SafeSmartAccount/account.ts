@@ -5,6 +5,7 @@ import { type Chain } from 'viem/chains'
 import { http, createPublicClient, type Address } from 'viem'
 import { V1_4_1_DEPLOYMENTS } from './config'
 import { entryPoint07Address } from 'viem/account-abstraction'
+import { RPC_URL } from './config'
 
 export const getSafeAccount = async (privateKey: `0x${string}`, chain: Chain) => {
     const deployment = V1_4_1_DEPLOYMENTS[chain.id]
@@ -14,7 +15,7 @@ export const getSafeAccount = async (privateKey: `0x${string}`, chain: Chain) =>
 
     const client = createPublicClient({
         chain,
-        transport: http(),
+        transport: http(RPC_URL[chain.id]),
     })
 
     const account = await toSafeSmartAccount({
@@ -47,7 +48,7 @@ export const predictSafeAccountAddress = async ({
 
     const client = createPublicClient({
         chain,
-        transport: http(),
+        transport: http(RPC_URL[chain.id]),
     })
 
     const address = await predictSafeSmartAccountAddress({

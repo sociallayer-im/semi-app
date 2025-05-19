@@ -58,7 +58,7 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
         functionName: 'decimals',
     })
 
-    const amountWithDecimals = BigInt(amount) * BigInt(10 ** decimals)
+    const amountWithDecimals = BigInt(Number(amount) * 10 ** decimals)
 
     const tx = {
         abi: erc20Abi,
@@ -72,18 +72,18 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
         calls: [tx]
     })
 
+    console.log('[gas]:', gas)
+
     const hash = await bundlerClient.sendUserOperation({
         account: smartAccount,
         calls: [tx],
-        maxFeePerGas: gas.callGasLimit,
-        maxPriorityFeePerGas: gas.preVerificationGas,
-        preVerificationGas: gas.preVerificationGas,
-        verificationGasLimit: gas.verificationGasLimit,
     })
 
     console.log('[userOperation hash]:', hash)
 
     const receipt = await bundlerClient.waitForUserOperationReceipt({ hash })
+
+    console.log('[userOperation receipt]:', receipt)
 
     return receipt
 }
