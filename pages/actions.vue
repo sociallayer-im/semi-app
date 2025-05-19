@@ -24,9 +24,11 @@
                 <div class="flex flex-row gap-2">
                     <div class="flex flex-col">
                         <div class="font-medium">To: {{ formatAddress(action.to) }}</div>
-                        <div class="text-gray-400 text-sm">{{ displayBalance(action.value) }} {{ action.token ===
-                            'NATIVE_COIN' ?
-                            useChain.chain.nativeCurrency.symbol : action.token }}</div>
+                        <div class="text-gray-400 text-sm flex flex-row gap-1 items-center" v-if="action.token === 'NATIVE_COIN'">
+                            <img src="/images/eth_logo.png" class="w-4 h-4 rounded-full" alt="">
+                            <div>{{ displayBalance(action.value, 6) }} {{ useChain.chain.nativeCurrency.symbol }}</div>
+                        </div>
+                        <div class="text-gray-400 text-sm" v-else> {{ displayBalance(action.value) }} {{ action.token }}</div>
                     </div>
                 </div>
 
