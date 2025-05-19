@@ -5,20 +5,19 @@
             返回
         </UButton>
 
-        <h1 class="text-2xl font-bold">活动记录</h1>
+        <h1 class="text-2xl font-bold mb-4">活动记录</h1>
 
-        <div class="flex flex-col gap-4 mt-4" v-if="actions.length === 0 && !loading">
+        <div class="flex flex-col gap-4" v-if="actions.length === 0 && !loading">
             <div class="text-gray-400 text-sm">当前没有数据</div>
         </div>
 
         <!-- 加载动画 -->
-        <div class="flex flex-col gap-4 mt-4" v-if="loading">
+        <div class="flex flex-col gap-4" v-if="loading">
             <div class="w-full h-10 rounded-lg loading-bg"></div>
             <div class="w-80 h-10 rounded-lg loading-bg"></div>
             <div class="w-full h-10 rounded-lg loading-bg"></div>
             <div class="w-80 h-10 rounded-lg loading-bg"></div>
             <div class="w-full h-10 rounded-lg loading-bg"></div>
-            <div class="w-90 h-10 rounded-lg loading-bg"></div>
         </div>
 
         <!-- 活动记录列表 -->
@@ -70,7 +69,7 @@ onMounted(async () => {
         loading.value = true
         try {
             const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-            const result = await fetch(`https://safe-client.safe.global/v1/chains/${chain.id}/safes/${safeAddress}/transactions/history?timezone=${timezone}&trusted=true&imitation=false`)
+            const result = await fetch(`/api/actions?safeAddress=${safeAddress}&chainId=${chain.id}&timezone=${timezone}`)
             const resultData = await result.json()
             console.log('[actionsresult]:', resultData)
             actions.value = parseActions(resultData.results)
