@@ -7,7 +7,7 @@
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
             <h1 class="text-2xl font-bold">验证手机号</h1>
             <div>请输入<span class="text-primary font-semibold mx-1">{{ phone.slice(0, 3) }}...{{ phone.slice(-4)
-                    }}</span>收到的8位验证码</div>
+                    }}</span>收到的6位验证码</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
                     <UPinInput variant="subtle" type="number" v-model="formState.pin" :length="6" size="xl" class="w-full"
@@ -91,7 +91,7 @@ const formState = reactive({
 const validatePin = (value: string[]) => {
     const pin = value.join('')
     if (!pin) return '请输入验证码'
-    if (!/^\d{6}$/.test(pin)) return '请输入8位数字验证码'
+    if (!/^\d{6}$/.test(pin)) return '请输入6位数字验证码'
     return true
 }
 

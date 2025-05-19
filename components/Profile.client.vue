@@ -31,7 +31,7 @@
                 </div>
                 <span class="text-sm mt-1">发送</span>
             </div>
-            <div class="flex flex-col items-center cursor-pointer">
+            <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/actions')">
                 <div class="bg-yellow-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:notebook" size="24" class="text-orange-500" />
                 </div>
