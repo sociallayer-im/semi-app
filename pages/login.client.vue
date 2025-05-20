@@ -32,7 +32,7 @@
                     :loading="loading"
                     :disabled="loading || !formState.phone"
                 >
-                    发送验证码
+                    下一步
                 </UButton>
             </UForm>
         </div>
@@ -65,10 +65,7 @@ const onSubmit = async () => {
     try {
         const validation = validatePhone(formState.phone)
         if (validation === true) {
-            const response = await sendSMS(formState.phone)
-            if (response.result === 'ok') {
-                await router.push(`/verifyphone?phone=${formState.phone}`)
-            }
+            await router.push(`/verify?phone=${formState.phone}`)
         } else {
             toast.add({
                 title: '请输入正确的手机号',
@@ -76,13 +73,6 @@ const onSubmit = async () => {
                 color: 'error'
             })
         }
-    } catch (error) {
-        console.error('发送验证码失败:', error)
-        toast.add({
-            title: '发送验证码失败',
-            description: '请检查手机号是否正确',
-            color: 'error'
-        })
     } finally {
         loading.value = false
     }

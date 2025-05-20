@@ -37,7 +37,7 @@
             <!-- 步骤2：输入验证码 -->
             <div v-if="step === 2" class="w-full">
                 <div class="text-center mb-4">
-                    <div class="text-gray-400 text-sm mb-2">请输入6位转账验证码</div>
+                    <div class="text-gray-400 text-sm mb-2">请输入密码</div>
                 </div>
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
@@ -134,9 +134,8 @@ const fetchBalance = async () => {
 const onSubmit = async () => {
     if (step.value === 1) {
         // 验证余额
-        const amount = parseFloat(formState.amount)
-        const balanceInEth = Number(balance.value / BigInt(10 ** (token.value?.decimals as number)))
-        if (amount > balanceInEth) {
+        const amount = Number(formState.amount) * 10 ** (token.value?.decimals as number)
+        if (amount > Number(balance.value)) {
             toast.add({
                 title: '余额不足',
                 description: '发送数量不能大于账户余额',

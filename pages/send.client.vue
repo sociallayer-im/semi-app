@@ -39,7 +39,7 @@
             <!-- 步骤2：输入验证码 -->
             <div v-if="step === 2" class="w-full">
                 <div class="text-center mb-4">
-                    <div class="text-gray-400 text-sm mb-2">请输入6位转账验证码</div>
+                    <div class="text-gray-400 text-sm mb-2">请输入6位密码</div>
                 </div>
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">

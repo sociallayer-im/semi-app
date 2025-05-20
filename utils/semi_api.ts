@@ -1,3 +1,6 @@
+import { sha256 } from 'viem/utils'
+
+
 // API 响应的基础接口
 interface BaseResponse {
     result?: 'ok';
@@ -60,7 +63,7 @@ function getAuthHeaders(): HeadersInit {
 
 // 设置认证令牌
 export function setAuthToken(token: string) {
-    setCookie(AUTH_TOKEN_KEY, token, 30); // 设置30天过期
+    setCookie(AUTH_TOKEN_KEY, token, 365); // 设置365天过期
 }
 
 // 清除认证令牌
@@ -231,3 +234,25 @@ export async function setEvmChainAddress(id: string, evm_chain_address: string, 
     });
     return handleRequest<BaseResponse>(response);
 }
+
+export async function signinWithPassword(phone: string, password: string, ) {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(password);
+    const hax = sha256(bytes)
+    console.log('password_hash', hax)
+    
+    const response = await fetch(`${API_BASE_URL}/signin_with_password`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ phone, password: hax}),
+    });
+
+    const data = await handleRequest<SignInResponse>(response);
+    
+    if (data.auth_token) {
+        setAuthToken(data.auth_token);
+    }
+
+    return data;
+}
+
