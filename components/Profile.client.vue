@@ -18,7 +18,7 @@
         </div>
 
         <!-- 操作按钮 -->
-        <div class="w-full flex justify-center gap-18 my-4">
+        <div class="w-full flex justify-around my-4">
             <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/receive')">
                 <div class="bg-green-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:qr-code" size="24" class="text-primary-500" />
