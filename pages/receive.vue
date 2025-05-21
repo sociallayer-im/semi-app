@@ -1,12 +1,12 @@
 <template>
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4">
-        <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
+        <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start"
             @click="router.push('/')">
             返回
         </UButton>
 
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
-            <div class="w-full flex flex-col items-center justify-center mb-8">
+            <div class="w-full flex flex-col items-center justify-center">
                 <h1 class="text-2xl font-bold mb-3">接收资产</h1>
                 <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
                     <qrcode-vue :value="data.safeAddress" :size="200" level="H" render-as="svg" />
