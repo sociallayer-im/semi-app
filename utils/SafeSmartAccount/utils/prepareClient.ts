@@ -1,6 +1,6 @@
 import { createPublicClient, http, type Chain } from "viem"
-import { createBundlerClient } from "viem/account-abstraction"
-import { BUNDLER_URL, RPC_URL } from "../config"
+import { createBundlerClient, createPaymasterClient } from "viem/account-abstraction"
+import { BUNDLER_URL, RPC_URL, PAYMASTER_URL } from "../config"
 
 export const prepareClient = async (chain: Chain) => {
     const bundlerUrl = BUNDLER_URL[chain.id]
@@ -14,13 +14,22 @@ export const prepareClient = async (chain: Chain) => {
         transport: http(RPC_URL[chain.id]),
     })
 
+    let paymasterClient = undefined
+
+    if (PAYMASTER_URL[chain.id]) {
+        paymasterClient = createPaymasterClient({
+            transport: http(PAYMASTER_URL[chain.id])
+        })
+    }
+
     const bundlerClient = createBundlerClient({
         chain,
-        transport: http(bundlerUrl)
+        transport: http(bundlerUrl),
+        paymaster: paymasterClient
     })
 
     return {
         publicClient,
-        bundlerClient
+        bundlerClient,
     }
 }
