@@ -20,7 +20,7 @@ export const POPULAR_ERC20_TOKENS: PopularTokenList = {
     },{
         name: 'WX',
         symbol: 'WX',
-        address: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
+        address: '0xA72b3c7106a0744d8A81f9FBeaA6312d44A13113',
         icon: 'https://ik.imagekit.io/soladata/mzbn05eg_KhYk9Pxg2',
         decimals: 18
     },{
