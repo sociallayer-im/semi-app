@@ -11,8 +11,11 @@
             <div v-if="step === 1" class="w-full">
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="to" label="接收地址">
-                        <UInput size="xl" class="w-full" variant="subtle" v-model="formState.to" placeholder="请输入接收地址"
-                            :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                        <div class="flex items-center flex-row gap-2">
+                            <UInput size="xl" class="w-full" variant="subtle" v-model="formState.to" placeholder="请输入接收地址"
+                                :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                            <ScanQrcodeBtn @onDetect="handleQrCodeDetect" />
+                        </div>
                     </UFormField>
 
                     <UFormField name="amount" label="发送数量" class="mt-4">
@@ -183,6 +186,27 @@ const onSubmit = async () => {
 const handleReset = () => {
     step.value = 1
     formState.code = Array(6).fill('')
+}
+
+const handleQrCodeDetect = (values: string[]) => {
+    if (values.length > 0) {
+        const address = values[0]
+        // 验证地址格式
+        if (isAddress(address)) {
+            formState.to = address
+            toast.add({
+                title: '扫码成功',
+                description: '已填入接收地址',
+                color: 'success'
+            })
+        } else {
+            toast.add({
+                title: '无效地址',
+                description: '扫描的二维码不是有效的以太坊地址',
+                color: 'error'
+            })
+        }
+    }
 }
 
 onMounted(async () => {
