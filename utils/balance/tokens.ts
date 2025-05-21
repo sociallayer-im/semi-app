@@ -18,6 +18,12 @@ export const POPULAR_ERC20_TOKENS: PopularTokenList = {
         icon: 'https://ik.imagekit.io/soladata/kg8ddpwy_r5he8h1o9',
         decimals: 18
     },{
+        name: 'WX',
+        symbol: 'WX',
+        address: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
+        icon: 'https://ik.imagekit.io/soladata/mzbn05eg_KhYk9Pxg2',
+        decimals: 18
+    },{
         name: 'Tether USD',
         symbol: 'USDT',
         address: '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58',
