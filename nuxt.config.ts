@@ -14,8 +14,5 @@ export default defineNuxtConfig({
         lang: 'zh-CN',
       }
     }
-  },
-  nitro: {
-    inlineDynamicImports: true
   }
 })
