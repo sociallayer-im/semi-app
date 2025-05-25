@@ -17,11 +17,9 @@
 
 <script setup lang="ts">
 import { useUserStore } from '../stores/user'
-import { exportKeyStore } from '~/utils/SafeSmartAccount'
 import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
-const user = computed(() => userStore.user)
 const toast = useToast()
 const router = useRouter()
 
