@@ -24,7 +24,7 @@
                                 <p class="font-medium mb-1 flex items-center gap-2">
                                     <UIcon name="ci:info" class="text-blue-500 text-xl" /> 安全提示
                                 </p>
-                                <p>请确保您只向此地址发送 {{ useChain.chain.nativeCurrency.symbol }} 资产，发送其他资产可能会导致资产丢失。</p>
+                                <p>请确保您只向此地址发送 {{ useChain.chain.name }} 资产，发送其他资产可能会导致资产丢失。</p>
                             </div>
                         </div>
                     </div>
