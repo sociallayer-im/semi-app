@@ -1,6 +1,6 @@
 import { POPULAR_ERC20_TOKENS, type TokenMetadata } from './tokens'
 import {createPublicClient, http, type Address, type Chain, erc20Abi} from 'viem'
-import { RPC_URL } from '~/utils/SafeSmartAccount/config'
+import { RPC_URL } from '~/utils/config'
 
 export async function getBalance(address: Address, chain: Chain) {
     const client = createPublicClient({

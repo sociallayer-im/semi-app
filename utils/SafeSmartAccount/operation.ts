@@ -3,7 +3,7 @@ import type { Address, Chain } from "viem"
 import { prepareClient } from "./utils/prepareClient"
 import { getSafeAccount } from "./account"
 import { erc20Abi, parseEther } from "viem"
-import { BUNDLER_URL } from "./config"
+import { BUNDLER_URL } from "../config"
 
 
 export interface TransferOptions {

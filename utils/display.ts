@@ -1,5 +1,6 @@
-import { formatUnits } from 'viem'
+import { formatUnits, type Chain, zeroAddress } from 'viem'
 import bignumber from 'bignumber.js'
+import { POPULAR_ERC20_TOKENS } from './balance/tokens'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
@@ -30,7 +31,7 @@ export interface ActionPreview {
     decimals?: number
 }
 
-export function parseActions(history: any[]) {
+export function parseSendActions(history: any[]) {
     const actions: ActionPreview[] = []
     history
     .filter((item) => item.type === 'TRANSACTION' && item.transaction.txInfo.type !== 'Creation')
@@ -48,6 +49,55 @@ export function parseActions(history: any[]) {
             txHex: item.transaction.txHash,
             symbol: item.transaction.txInfo.transferInfo.tokenSymbol,
             decimals: item.transaction.txInfo.transferInfo.decimals,
+        })
+    })
+
+    return actions
+}
+
+export function parseActionsFromAlchemyApi(history: any[], chain: Chain, direction: 'income' | 'outgoing') {
+    const supportedTokens = POPULAR_ERC20_TOKENS[chain.id]
+    if (!supportedTokens) {
+        throw new Error('Unsupported chain')
+    }
+    
+    const actions: ActionPreview[] = []
+    history.forEach((item) => {
+        if (!item.rawContract?.address && item.category === 'external') {
+            // native coin
+            actions.push({
+                from: item.from,
+                to: item.to,
+                value: BigInt(item.rawContract.value),
+                date: item.metadata.blockTimestamp,
+                status: 'SUCCESS',
+                direction: direction,
+                token: zeroAddress,
+                type: item.category,
+                txHex: item.hash,
+                symbol: chain.nativeCurrency.symbol,
+                decimals: chain.nativeCurrency.decimals,
+            })
+            return
+        }
+        
+        const token = supportedTokens.find((token) => token.address.toLowerCase() === item.rawContract?.address.toLowerCase())
+        if (!token) {
+            return
+        }
+
+        actions.push({
+            from: item.from,
+            to: item.to,
+            value: BigInt(item.rawContract.value),
+            date: item.metadata.blockTimestamp,
+            status: 'SUCCESS',
+            direction: direction,
+            token: token.address,
+            type: item.category,
+            txHex: item.hash,
+            symbol: token.symbol,
+            decimals: token.decimals,
         })
     })
 

@@ -85,3 +85,8 @@ export const PAYMASTER_URL: PaymasterUrl = {
     10: import.meta.env.VITE_OP_PAYMASTER
 }
 
+export const ALCHEMY_API: BundlerUrl = {
+    10: import.meta.env.VITE_OP_ALCHEMY_API!,
+    11155111: import.meta.env.VITE_SEPOLIA_ALCHEMY_API!,
+}
+
