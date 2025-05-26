@@ -3,6 +3,9 @@ import bignumber from 'bignumber.js'
 import { POPULAR_ERC20_TOKENS } from './balance/tokens'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/zh-cn'
+
+dayjs.locale('zh-cn')
 dayjs.extend(relativeTime)
 
 
