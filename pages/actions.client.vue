@@ -5,7 +5,13 @@
             返回
         </UButton>
 
-        <h1 class="text-2xl font-bold mb-4">活动记录</h1>
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-2xl font-bold">活动记录</h1>
+            <UButton icon="i-ci-external-link" color="primary" variant="ghost" 
+                @click="toSafeExplorer">
+                区块浏览器
+            </UButton>
+        </div>
 
         <!-- 加载动画 -->
         <div class="flex flex-col gap-4" v-if="loading">
@@ -90,6 +96,13 @@ const router = useRouter()
 const toExplorer = (tx: string) => {
     const url = useChain.chain.blockExplorers?.default?.url
     window.open(`${url}/tx/${tx}`, '_blank')
+}
+
+const toSafeExplorer = () => {
+    if (user.value?.evm_chain_address) {
+        const url = useChain.chain.blockExplorers?.default?.url
+        window.open(`${url}/address/${user.value.evm_chain_address}`, '_blank')
+    }
 }
 
 const tabs: TabsItem[] = [
