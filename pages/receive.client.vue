@@ -5,7 +5,7 @@
             返回
         </UButton>
 
-        <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
+        <div class="flex flex-col items-center justify-center h-full gap-4 py-2 w-[80%] mx-auto">
             <div class="w-full flex flex-col items-center justify-center">
                 <h1 class="text-2xl font-bold mb-3">接收资产</h1>
                 <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
