@@ -14,7 +14,7 @@
 
                 <div class="text-center">
                     <div class="text-gray-400 text-sm mb-2">扫描二维码接收资产</div>
-                    <AddressDisplay :address="data.safeAddress" />
+                    <AddressDisplay :address="data.safeAddress" :compact="false" :showAvatar="false" />
                 </div>
 
                 <div class="w-full mt-8">
