@@ -8,6 +8,11 @@ export default defineNuxtConfig({
   },
   modules: ['@nuxt/icon', '@nuxt/ui', '@pinia/nuxt'],
   css: ['~/assets/css/main.css'],
+  routeRules: {
+    '/api/**': {
+      cors: true,
+    },
+  },
   app: {
     head: {
       title: 'Semi', // default fallback title
