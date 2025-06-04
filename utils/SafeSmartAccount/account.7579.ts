@@ -26,8 +26,6 @@ export const getAccountConfig = (chain: Chain) => {
         },
         safe4337ModuleAddress: deployment.safe_7579_module,
         erc7579LaunchpadAddress: deployment.erc7579_launchpad,
-        safeProxyFactoryAddress: deployment.safe_proxy_factory,
-        safeSingletonAddress: deployment.safe,
         attesters: ['0xA4C777199658a41688E9488c4EcbD7a2925Cc23A'] as `0x${string}`[],
         attestersThreshold: 1,
         saltNonce: BigInt(0)

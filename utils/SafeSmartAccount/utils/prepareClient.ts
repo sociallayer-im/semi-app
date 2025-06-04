@@ -22,7 +22,7 @@ export const prepareClient = async (chain: Chain, safeAccount?: ToSafeSmartAccou
 
     if (PAYMASTER_URL[chain.id]) {
         paymasterClient = createPaymasterClient({
-            transport: http(PAYMASTER_URL[chain.id])
+            transport: http(PAYMASTER_URL[chain.id]),
         })
     }
 
@@ -36,11 +36,23 @@ export const prepareClient = async (chain: Chain, safeAccount?: ToSafeSmartAccou
                 version: "0.7",
             },
         })
+
+        // if (PAYMASTER_URL[chain.id]) {
+        //     paymasterClient = createPimlicoClient({
+        //         transport: http(PAYMASTER_URL[chain.id]),
+        //         chain: chain,
+        //         entryPoint: {
+        //             address: entryPoint07Address,
+        //             version: "0.7",
+        //         },
+        //     })
+        // }
+
         smartAccountClient = createSmartAccountClient({
             account: safeAccount,
             chain,
             bundlerTransport: http(bundlerUrl),
-            paymaster: paymasterClient || pimlicoClient,
+            paymaster: pimlicoClient,
             userOperation: {
                 estimateFeesPerGas: async () => {
                     return (await pimlicoClient.getUserOperationGasPrice()).fast;

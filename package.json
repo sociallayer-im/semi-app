@@ -24,7 +24,7 @@
     "ethers": "^6.14.1",
     "nuxt": "^3.17.3",
     "ox": "0.6.7",
-    "permissionless": "^0.2.47",
+    "permissionless": "0.2.17",
     "pinia": "^3.0.2",
     "qrcode.vue": "^3.6.0",
     "viem": "2.28.1",
@@ -32,7 +32,8 @@
     "vue-boring-avatars": "^1.4.0",
     "vue-qrcode-reader": "^5.7.2",
     "vue-router": "^4.5.1",
-    "wagmi": "^2.15.4"
+    "wagmi": "^2.15.4",
+    "zod": "^3.25.50"
   },
   "devDependencies": {
     "@iconify-json/ci": "^1.2.2",
