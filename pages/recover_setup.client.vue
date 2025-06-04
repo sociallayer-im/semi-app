@@ -44,8 +44,6 @@
 
             <!-- 第三步：开始设置 -->
             <UForm v-if="currentStep === 3" :state="formState" @submit="onPasswordSubmit" class="w-full">
-                <h1 class="text-2xl font-bold text-center mb-3">{{ '开始设置' }}</h1>
-
                 <div v-if="!recoverStep.setupCompleted">
                     <div :class="['flex items-center gap-2 my-2 justify-between', recoverStep.checkContractDeployed ? 'text-green-500' : 'text-gray-500']">
                         检查用户合约部署
