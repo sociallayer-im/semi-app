@@ -45,5 +45,6 @@ export const POPULAR_ERC20_TOKENS: PopularTokenList = {
             decimals: 6,
             icon: 'https://ik.imagekit.io/soladata/57yobknk_WoLp8Wvot'
         },
-    ]
+    ],
+    84532: []
 }

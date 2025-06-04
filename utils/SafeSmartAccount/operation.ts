@@ -1,17 +1,18 @@
 import type { Address, Chain } from "viem"
 
 import { prepareClient } from "./utils/prepareClient"
-import { getSafeAccount } from "./account"
 import { erc20Abi, parseEther } from "viem"
 import { BUNDLER_URL } from "../config"
+import { safeAbi } from "./utils/abis/Safe"
+import type { ToSafeSmartAccountReturnType } from "permissionless/accounts"
 
 
 export interface TransferOptions {
     to: Address
     amount: string
     erc20TokenAddress?: Address
-    privateKey: `0x${string}`
     chain: Chain
+    safeAccount: ToSafeSmartAccountReturnType
 }
 
 interface GasPrice {
@@ -20,7 +21,7 @@ interface GasPrice {
 }
 
 const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundlerClient: any) => {
-    if (chain.id !== 10) return null
+    if (chain.id !== 10 && chain.id !== 84532) return null
 
     const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
     console.log('[Gas Price]:', {
@@ -47,12 +48,12 @@ const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundle
     }
 }
 
-const executeUserOperation = async (params: any, bundlerClient: any) => {
+const executeUserOperation = async (params: any, smartAccountClient: any) => {
     try {
-        const hash = await bundlerClient.sendUserOperation(params)
+        const hash = await smartAccountClient.sendUserOperation(params)
         console.log('[UserOperation Hash]:', hash)
         
-        const receipt = await bundlerClient.waitForUserOperationReceipt({ hash })
+        const receipt = await smartAccountClient.waitForUserOperationReceipt({ hash })
         console.log('[UserOperation Receipt]:', receipt)
         
         return receipt
@@ -62,35 +63,29 @@ const executeUserOperation = async (params: any, bundlerClient: any) => {
     }
 }
 
-export const transfer = async ({ to, amount, privateKey, chain }: TransferOptions) => {
-    const smartAccount = await getSafeAccount(privateKey, chain)
-    const { bundlerClient } = await prepareClient(chain)
 
+export const transfer = async ({ to, amount, chain, safeAccount}: TransferOptions) => {
+    const { smartAccountClient } = await prepareClient(chain, safeAccount)
+    
     const tx = {
         to,
         value: parseEther(amount)
     } as const
 
     const params = {
-        account: smartAccount,
+        account: safeAccount,
         calls: [tx],
     }
 
-    const gasParams = await getGasParameters(chain, smartAccount, tx, bundlerClient)
-    if (gasParams) {
-        Object.assign(params, gasParams)
-    }
-
-    return executeUserOperation(params, bundlerClient)
+    return executeUserOperation(params, smartAccountClient)
 }
 
-export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenAddress }: TransferOptions) => {
+export const transferErc20 = async ({ to, amount, chain, erc20TokenAddress, safeAccount }: TransferOptions) => {
     if (!erc20TokenAddress) {
         throw new Error('ERC20 token address is required')
     }
 
-    const smartAccount = await getSafeAccount(privateKey, chain)
-    const { publicClient, bundlerClient } = await prepareClient(chain)
+    const { publicClient, smartAccountClient } = await prepareClient(chain, safeAccount)
 
     const decimals = await publicClient.readContract({
         address: erc20TokenAddress,
@@ -108,16 +103,16 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
     } as const
 
     const params = {
-        account: smartAccount,
+        account: safeAccount,
         calls: [tx],
     }
 
-    const gasParams = await getGasParameters(chain, smartAccount, tx, bundlerClient)
+    const gasParams = await getGasParameters(chain, safeAccount, tx, smartAccountClient)
     if (gasParams) {
         Object.assign(params, gasParams)
     }
 
-    return executeUserOperation(params, bundlerClient)
+    return executeUserOperation(params, smartAccountClient)
 }
 
 export const pimlicoGetUserOperationGasPrice = async (chain: Chain): Promise<GasPrice> => {
@@ -153,4 +148,17 @@ export const pimlicoGetUserOperationGasPrice = async (chain: Chain): Promise<Gas
         console.error('[Gas Price Error]:', error)
         throw new Error(`Failed to get gas price: ${error instanceof Error ? error.message : String(error)}`)
     }
+}
+
+export const isModuleEnabled = async (chain: Chain, moduleAddress: Address, safeAccountAddress: Address) => {
+    const { publicClient } = await prepareClient(chain)
+
+    const isEnabled = await publicClient.readContract({
+        address: safeAccountAddress,
+        abi: safeAbi,
+        functionName: 'isModuleEnabled',
+        args: [moduleAddress],
+    })
+
+    return isEnabled
 }

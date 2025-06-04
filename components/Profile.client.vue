@@ -11,7 +11,7 @@
             <div>
                 <div class="text-gray-400 text-sm">余额</div>
                 <div class="flex items-center gap-2">
-                    <span class="text-3xl font-bold">{{ displayBalance(data.balance) }} {{
+                    <span class="text-3xl font-bold">{{ displayBalance(data.balance, 6) }} {{
                         useChain.chain.nativeCurrency.symbol }}</span>
                 </div>
             </div>
@@ -42,8 +42,8 @@
         <!-- 分割线 -->
         <div class="w-full border-t border-muted my-4"></div>
 
-         <!-- 加载动画 -->
-         <div class="flex flex-col gap-4 mt-4" v-if="loading">
+        <!-- 加载动画 -->
+        <div class="flex flex-col gap-4 mt-4" v-if="loading">
             <div class="w-full h-10 rounded-lg loading-bg"></div>
             <div class="w-80 h-10 rounded-lg loading-bg"></div>
             <div class="w-full h-10 rounded-lg loading-bg"></div>
@@ -54,8 +54,7 @@
         <div class="flex flex-col flex-1  overflow-y-auto" v-else>
             <!-- 主链资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                @click="navigateTo('/send')"
-            >
+                @click="navigateTo('/send')">
                 <div class="flex items-center gap-3">
                     <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
                     <div>
@@ -64,14 +63,13 @@
                     </div>
                 </div>
                 <div class="flex flex-col items-end">
-                    <span class="font-medium">{{ displayBalance(data.balance) }}</span>
+                    <span class="font-medium">{{ displayBalance(data.balance, 6) }}</span>
                 </div>
             </div>
 
             <!-- 代币资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                v-for="balance in balances"
-                @click="navigateTo(`/senderc20/${balance.token.address}`)"
+                v-for="balance in balances" @click="navigateTo(`/senderc20/${balance.token.address}`)"
                 :key="balance.token.address">
                 <div class="flex items-center gap-3">
                     <img :src="balance.token.icon" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />
@@ -93,6 +91,10 @@ import { getBalance, getPopularERC20Balance, type ERC20Balance } from '~/utils/b
 import { useUserStore } from '../stores/user'
 import { useChainStore } from '../stores/chain'
 import { displayBalance } from '~/utils/display'
+import { predictSafeAccount } from '~/utils/SafeSmartAccount'
+import { useModuleStore } from '../stores/module'
+import type { Address } from 'viem'
+import type { Awaited } from '@vueuse/shared'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
@@ -100,18 +102,18 @@ const loading = ref(false)
 const toast = useToast()
 const useChain = useChainStore()
 const balances = ref<ERC20Balance[]>([])
+const moduleStore = useModuleStore()
 
 const data = reactive({
     safeAddress: '',
     balance: BigInt(0)
 })
 
-onMounted(async () => {
+const fetchData = async (safeAccountAddress: Address) => {
     try {
         loading.value = true
-        data.safeAddress = user.value?.evm_chain_address as string
-        data.balance = await getBalance(user.value?.evm_chain_address as `0x${string}`, useChain.chain)
-        balances.value = await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, useChain.chain)
+        data.balance = await getBalance(safeAccountAddress, useChain.chain)
+        balances.value = await getPopularERC20Balance(safeAccountAddress, useChain.chain)
     } catch (error) {
         console.error(error)
         toast.add({
@@ -122,5 +124,12 @@ onMounted(async () => {
     } finally {
         loading.value = false
     }
-})
+}
+
+watch(() => moduleStore.module, async (newModule) => {
+    const safeAccount = await predictSafeAccount(user.value?.evm_chain_active_key as `0x${string}`, useChain.chain, newModule)
+    data.safeAddress = safeAccount
+    console.log(`[safeAccount ${newModule}]:`, safeAccount)
+    await fetchData(safeAccount as Address)
+}, { immediate: true })
 </script>

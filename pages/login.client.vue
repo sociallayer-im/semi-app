@@ -56,7 +56,7 @@ const formState = reactive({
 
 const validatePhone = (value: string) => {
     if (!value) return '请输入手机号'
-    if (!/^\d{11}$/.test(value)) return '请输入11位数字手机号'
+    //if (!/^\d{11}$/.test(value)) return '请输入11位数字手机号'
     return true
 }
 

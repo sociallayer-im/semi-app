@@ -27,7 +27,7 @@
                     <div class="mt-4">
                         <div class="text-gray-400 text-sm">余额</div>
                         <div class="flex items-center gap-2">
-                            <span class="text-3xl font-bold">{{ displayBalance(balance) }} {{
+                            <span class="text-3xl font-bold">{{ displayBalance(balance, 8) }} {{
                                 useChain.chain.nativeCurrency.symbol }}</span>
                         </div>
                     </div>
@@ -69,9 +69,9 @@
 
 <script setup lang="ts">
 import { getBalance } from '~/utils/balance'
-import { formatEther } from 'viem'
+import { formatEther, parseEther } from 'viem'
 import { useChainStore } from '../stores/chain'
-import { getSafeAccount, predictSafeAccountAddress, transfer } from '~/utils/SafeSmartAccount'
+import { getSafeAccount, predictSafeAccount, transfer } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
 import { isAddress } from 'viem'
 import { useUserStore } from '~/stores/user'
@@ -83,6 +83,8 @@ const useChain = useChainStore()
 const balance = ref<bigint>(BigInt(0))
 const step = ref(1)
 const user = useUserStore()
+const moduleStore = useModuleStore()
+
 const formState = reactive({
     to: '',
     amount: '',
@@ -102,15 +104,13 @@ const isCodeComplete = computed(() => {
     return formState.code.length === 6 && formState.code.every(digit => digit !== '')
 })
 
+
 // 获取余额
 const fetchBalance = async () => {
     try {
         loading.value = true
-        const predictSafeAddress = await predictSafeAccountAddress({
-            owner: user.user?.evm_chain_active_key as `0x${string}`,
-            chain: useChain.chain
-        })
-        balance.value = await getBalance(predictSafeAddress, useChain.chain)
+        const account = await predictSafeAccount(user.user?.evm_chain_active_key as `0x${string}`, useChain.chain, moduleStore.module)
+        balance.value = await getBalance(account, useChain.chain)
     } catch (error) {
         console.error(error)
         toast.add({
@@ -141,20 +141,22 @@ const onSubmit = async () => {
         return
     }
 
-    // TODO: 实现转账逻辑
     const mnemonic = await decryptKeystoreToMnemonic(JSON.parse(user.user?.encrypted_keys as string), formState.code.join(''))
-    const privateKey = await mnemonicToPrivateKey(mnemonic)
+    const privateKey = mnemonicToPrivateKey(mnemonic)
 
     loading.value = true
     try {
         // 这里添加转账逻辑
+        const account =  await getSafeAccount(privateKey as `0x${string}`, useChain.chain, moduleStore.module)
+        console.log('[account address]:', account.address)
         await transfer({
             to: formState.to as `0x${string}`,
             amount: formState.amount,
-            privateKey: privateKey as `0x${string}`,
-            chain: useChain.chain
+            chain: useChain.chain,
+            safeAccount: account
         })
-        
+
+    
         toast.add({
             title: '转账成功',
             description: '转账已提交',

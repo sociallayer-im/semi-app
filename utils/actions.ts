@@ -1,13 +1,9 @@
 import type { Chain } from "viem"
 import { parseSendActions, parseActionsFromAlchemyApi } from "./display"
-import { Alchemy, Network, AssetTransfersCategory, SortingOrder } from "alchemy-sdk";
+import { Alchemy, AssetTransfersCategory, SortingOrder } from "alchemy-sdk";
 import { POPULAR_ERC20_TOKENS } from "./balance/tokens";
+import { CHAIN_TO_NETWORK } from "./config";
 
-// 网络映射配置
-const CHAIN_TO_NETWORK: Record<number, Network> = {
-    10: Network.OPT_MAINNET,
-    11155111: Network.ETH_SEPOLIA,
-};
 
 // 获取 Alchemy 实例
 const getAlchemyInstance = (chain: Chain): Alchemy => {

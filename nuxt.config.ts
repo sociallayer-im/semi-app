@@ -13,6 +13,9 @@ export default defineNuxtConfig({
       cors: true,
     },
   },
+  experimental: {
+    clientNodeCompat: true,
+  },
   app: {
     head: {
       title: 'Semi', // default fallback title

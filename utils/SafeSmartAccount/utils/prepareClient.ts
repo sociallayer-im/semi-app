@@ -1,8 +1,12 @@
 import { createPublicClient, http, type Chain } from "viem"
-import { createBundlerClient, createPaymasterClient } from "viem/account-abstraction"
+import { createBundlerClient, createPaymasterClient, entryPoint07Address } from "viem/account-abstraction"
 import { BUNDLER_URL, RPC_URL, PAYMASTER_URL } from "../../config"
+import { createSmartAccountClient } from "permissionless";
+import { erc7579Actions } from "permissionless/actions/erc7579";
+import { createPimlicoClient } from "permissionless/clients/pimlico";
+import type { ToSafeSmartAccountReturnType } from "permissionless/accounts";
 
-export const prepareClient = async (chain: Chain) => {
+export const prepareClient = async (chain: Chain, safeAccount?: ToSafeSmartAccountReturnType) => {
     const bundlerUrl = BUNDLER_URL[chain.id]
     if (!bundlerUrl) {
         console.log('Unsupported chain: ', chain)
@@ -22,14 +26,31 @@ export const prepareClient = async (chain: Chain) => {
         })
     }
 
-    const bundlerClient = createBundlerClient({
-        chain,
-        transport: http(bundlerUrl),
-        paymaster: paymasterClient
-    })
+    let smartAccountClient = undefined
+    if (safeAccount) {
+        const pimlicoClient = createPimlicoClient({
+            transport: http(bundlerUrl),
+            chain: chain,
+            entryPoint: {
+                address: entryPoint07Address,
+                version: "0.7",
+            },
+        })
+        smartAccountClient = createSmartAccountClient({
+            account: safeAccount,
+            chain,
+            bundlerTransport: http(bundlerUrl),
+            paymaster: paymasterClient || pimlicoClient,
+            userOperation: {
+                estimateFeesPerGas: async () => {
+                    return (await pimlicoClient.getUserOperationGasPrice()).fast;
+                },
+            },
+        }).extend(erc7579Actions())
+    }
 
     return {
         publicClient,
-        bundlerClient,
+        smartAccountClient,
     }
 }

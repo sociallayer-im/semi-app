@@ -26,7 +26,7 @@
 import { useUserStore } from '~/stores/user'
 import { useChainStore } from '~/stores/chain'
 import { generateMnemonicPhrase, getAddressFromMnemonic, encryptMnemonicToKeystore } from '~/utils/encryption'
-import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
+import { predictErc4337SafeAccountAddress } from '~/utils/SafeSmartAccount'
 import { setEncryptedKeys } from '~/utils/semi_api'
 
 const router = useRouter()
@@ -57,7 +57,7 @@ const createManagerWallet = async (pin: string, userId: string) => {
         const evm_chain_active_key = getAddressFromMnemonic(mnemonic)
 
         // 第二步：生成EVM链地址
-        const evm_chain_address = await predictSafeAccountAddress({
+        const evm_chain_address = await predictErc4337SafeAccountAddress({
             owner: evm_chain_active_key,
             chain: useChain.chain,
         })
