@@ -12,21 +12,22 @@
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="to" label="接收地址">
                         <div class="flex items-center flex-row gap-2">
-                            <UInput size="xl" class="w-full" variant="subtle" v-model="formState.to" placeholder="请输入接收地址"
-                                :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                            <UInput size="xl" class="w-full" variant="subtle" v-model="formState.to"
+                                placeholder="请输入接收地址" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                             <ScanQrcodeBtn @onDetect="handleQrCodeDetect" />
                         </div>
                     </UFormField>
 
                     <UFormField name="amount" label="发送数量" class="mt-4">
-                        <UInput variant="subtle" size="xl" class="w-full" v-model="formState.amount" placeholder="请输入发送数量"
-                            :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                        <UInput variant="subtle" size="xl" class="w-full" v-model="formState.amount"
+                            placeholder="请输入发送数量" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                     </UFormField>
 
                     <div class="mt-4">
                         <div class="text-gray-400 text-sm">余额</div>
                         <div class="flex items-center gap-2">
-                            <span class="text-3xl font-bold">{{ displayBalance(balance, 6, token?.decimals) }} {{ token?.symbol }}</span>
+                            <span class="text-3xl font-bold">{{ displayBalance(balance, 6, token?.decimals) }} {{
+                                token?.symbol }}</span>
                         </div>
                     </div>
 
@@ -45,8 +46,8 @@
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="code">
-                        <UPinInput variant="subtle" type="number" v-model="formState.code" :length="6" size="xl" class="w-full"
-                            :ui="{ base: 'w-full' }" :disabled="loading" mask />
+                        <UPinInput variant="subtle" type="number" v-model="formState.code" :length="6" size="xl"
+                            class="w-full" :ui="{ base: 'w-full' }" :disabled="loading" mask />
                     </UFormField>
 
                     <div class="flex gap-4 mt-4">
@@ -71,10 +72,11 @@ import { useChainStore } from '@/stores/chain'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getErc20Balance } from '~/utils/balance'
-import { predictSafeAccountAddress, transferErc20 } from '~/utils/SafeSmartAccount'
+import { predictSafeAccount, transferErc20, getSafeAccount } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
 import { isAddress } from 'viem'
 import { decryptKeystoreToMnemonic, mnemonicToPrivateKey } from '~/utils/encryption'
+import { useModuleStore } from '~/stores/module'
 
 const route = useRoute()
 const router = useRouter()
@@ -84,6 +86,8 @@ const toast = useToast()
 const balance = ref<bigint>(BigInt(0))
 const step = ref(1)
 const user = useUserStore()
+const moduleStore = useModuleStore()
+const module = computed(() => moduleStore.module)
 
 const tokenAddress = computed(() => route.params.tokenAddress)
 const token = computed(() => POPULAR_ERC20_TOKENS[useChain.chain.id].find((token) => token.address === tokenAddress.value))
@@ -111,10 +115,11 @@ const isCodeComplete = computed(() => {
 const fetchBalance = async () => {
     try {
         loading.value = true
-        const predictSafeAddress = await predictSafeAccountAddress({
-            owner: user.user?.evm_chain_active_key as `0x${string}`,
-            chain: useChain.chain
-        })
+        const predictSafeAddress = await predictSafeAccount(
+            user.user?.evm_chain_active_key as `0x${string}`,
+            useChain.chain,
+            module.value
+        )
         balance.value = await getErc20Balance(
             predictSafeAddress,
             token.value?.address as `0x${string}`,
@@ -157,11 +162,11 @@ const onSubmit = async () => {
         await transferErc20({
             to: formState.to as `0x${string}`,
             amount: formState.amount,
-            privateKey: privateKey as `0x${string}`,
+            safeAccount: await getSafeAccount(privateKey as `0x${string}`, useChain.chain, module.value),
             chain: useChain.chain,
             erc20TokenAddress: token.value?.address as `0x${string}`
         })
-        
+
         toast.add({
             title: '转账成功',
             description: '转账已提交',

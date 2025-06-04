@@ -6,15 +6,30 @@
         </UButton>
 
         <div class="flex flex-col items-center justify-center h-full gap-4 py-2 w-[80%] mx-auto">
+            <!-- 加载动画 -->
+
+
             <div class="w-full flex flex-col items-center justify-center">
                 <h1 class="text-2xl font-bold mb-3">接收资产</h1>
-                <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
-                    <qrcode-vue :value="data.safeAddress" :size="200" level="H" render-as="svg" />
+
+                <div class="w-full flex flex-col gap-4" v-if="loading" style="min-height: 340px;">
+                    <div class="w-full h-10 rounded-lg loading-bg"></div>
+                    <div class="w-80 h-10 rounded-lg loading-bg"></div>
+                    <div class="w-full h-10 rounded-lg loading-bg"></div>
+                    <div class="w-80 h-10 rounded-lg loading-bg"></div>
+                    <div class="w-full h-10 rounded-lg loading-bg"></div>
+                    <div class="w-full h-10 rounded-lg loading-bg"></div>
                 </div>
 
-                <div class="text-center">
-                    <div class="text-gray-400 text-sm mb-2">扫描二维码接收资产</div>
-                    <AddressDisplay :address="data.safeAddress" :compact="false" :showAvatar="false" />
+                <div class="w-full flex flex-col items-center justify-center" v-if="!loading">
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
+                        <qrcode-vue :value="data.safeAddress" :size="200" level="H" render-as="svg" />
+                    </div>
+
+                    <div class="text-center">
+                        <div class="text-gray-400 text-sm mb-2">扫描二维码接收资产</div>
+                        <AddressDisplay :address="data.safeAddress" :compact="false" :showAvatar="false" />
+                    </div>
                 </div>
 
                 <div class="w-full mt-8">
@@ -37,8 +52,9 @@
 <script setup lang="ts">
 import QrcodeVue from 'qrcode.vue'
 import { useChainStore } from '../stores/chain'
-import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
+import { predictSafeAccount } from '~/utils/SafeSmartAccount'
 import { useRouter } from 'vue-router'
+import { useModuleStore } from '~/stores/module'
 
 const router = useRouter()
 const useChain = useChainStore()
@@ -49,6 +65,9 @@ const data = reactive({
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
+const moduleStore = useModuleStore()
+const module = computed(() => moduleStore.module)
+const loading = ref(false)
 
 onMounted(async () => {
     try {
@@ -56,7 +75,8 @@ onMounted(async () => {
         //     owner: '0x6AEF77e177547551476bB8950359F1EB0AC4488f' as `0x${string}`,
         //     chain: useChain.chain
         // })
-        data.safeAddress = user.value?.evm_chain_address as string
+        loading.value = true
+        data.safeAddress = await predictSafeAccount(user.value?.evm_chain_active_key as `0x${string}`, useChain.chain, module.value) as string
     } catch (error) {
         console.error(error)
         toast.add({
@@ -64,6 +84,8 @@ onMounted(async () => {
             description: '请稍后再试',
             color: 'error'
         })
+    } finally {
+        loading.value = false
     }
 })
 </script>

@@ -82,14 +82,18 @@ import type { Chain } from 'viem'
 import { formatAddress, displayDate, displayBalance } from '../utils/display'
 import { getReceiveActions, getSendActionsV2 } from '../utils/actions'
 import type { TabsItem } from '@nuxt/ui'
+import { useModuleStore } from '~/stores/module'
+import { predictSafeAccount } from '~/utils/SafeSmartAccount'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
-const loading = ref(false)
+const loading = ref(true)
 const useChain = useChainStore()
 const sendActions = ref<ActionPreview[]>([])
 const receiveActions = ref<ActionPreview[]>([])
 const toast = useToast()
+const moduleStore = useModuleStore()
+const module = computed(() => moduleStore.module)
 
 const router = useRouter()
 
@@ -142,9 +146,10 @@ onMounted(async () => {
         }
     }
 
-
-    if (user.value?.evm_chain_address) {
-        updateActions(useChain.chain, user.value?.evm_chain_address!)
+    if (user.value?.evm_chain_active_key) {
+        const safeAddress = await predictSafeAccount(user.value?.evm_chain_active_key as `0x${string}`, useChain.chain, module.value)
+        console.log('[safeAddress]:', safeAddress)
+        updateActions(useChain.chain, safeAddress as string)
     }
 })
 </script>

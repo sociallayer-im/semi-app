@@ -94,11 +94,10 @@ import { displayBalance } from '~/utils/display'
 import { predictSafeAccount } from '~/utils/SafeSmartAccount'
 import { useModuleStore } from '../stores/module'
 import type { Address } from 'viem'
-import type { Awaited } from '@vueuse/shared'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
-const loading = ref(false)
+const loading = ref(true)
 const toast = useToast()
 const useChain = useChainStore()
 const balances = ref<ERC20Balance[]>([])
