@@ -105,8 +105,8 @@ const recoverStep = reactive({
 })
 
 const formState = reactive({
-    email: 'webdbcosmo@gmail.com',
-    pin: Array(6).fill('1')
+    email: '',
+    pin: Array(6).fill('')
 })
 
 const isValidEmail = computed(() => {
