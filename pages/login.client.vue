@@ -65,7 +65,8 @@ const onSubmit = async () => {
     try {
         const validation = validatePhone(formState.phone)
         if (validation === true) {
-            await router.push(`/verify?phone=${formState.phone}`)
+            await sendSMS(formState.phone)
+            await router.push(`/verifyphone?phone=${formState.phone}`)
         } else {
             toast.add({
                 title: '请输入正确的手机号',
