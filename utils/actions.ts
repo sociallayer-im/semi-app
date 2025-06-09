@@ -5,6 +5,7 @@ import { POPULAR_ERC20_TOKENS } from "./balance/tokens";
 
 // 网络映射配置
 const CHAIN_TO_NETWORK: Record<number, Network> = {
+    1: Network.ETH_MAINNET,
     10: Network.OPT_MAINNET,
     11155111: Network.ETH_SEPOLIA,
 };
@@ -33,11 +34,17 @@ const getAssetTransfers = async (
     try {
         const contractAddresses = POPULAR_ERC20_TOKENS[chain.id].map((token) => token.address);
         console.log('[contractAddresses]:', contractAddresses);
+        const category = [AssetTransfersCategory.ERC20, AssetTransfersCategory.EXTERNAL]
+        if (chain.id !== 10) {
+            // optimism do not support internal transfer history indexing in alchemy api
+            category.push(AssetTransfersCategory.INTERNAL)
+        }
+        
         const params = {
             fromBlock: "0x0",
             excludeZeroValue: true,
             withMetadata: true,
-            category: [AssetTransfersCategory.ERC20, AssetTransfersCategory.EXTERNAL],
+            category,
             ...(direction === 'from' ? { fromAddress: address } : { toAddress: address }),
             contractAddresses,
             maxCount: 50,

@@ -20,7 +20,7 @@ interface GasPrice {
 }
 
 const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundlerClient: any) => {
-    if (chain.id !== 10) return null
+    if (chain.id !== 10 && chain.id !== 1) return null
 
     const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
     console.log('[Gas Price]:', {

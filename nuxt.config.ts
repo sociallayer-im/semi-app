@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Semi', // default fallback title
+      title: '南塘数字身份', // default fallback title
       htmlAttrs: {
         lang: 'zh-CN',
       }

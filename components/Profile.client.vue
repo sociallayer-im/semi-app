@@ -1,9 +1,14 @@
 <template>
-    <div class="flex flex-col container-size h-[100vh] rounded-xl bg-[var(--ui-bg)] shadow-lg px-4 sm:px-8 py-8 banner">
+    <div class="flex flex-col container-size h-[100vh] rounded-xl bg-[var(--ui-bg)] shadow-lg px-4 py-6 banner">
         <!-- 顶部账户信息 -->
         <div class="w-full flex items-center justify-between mb-4">
-            <AddressDisplay :address="data.safeAddress" />
+            <div class="flex items-center gap-2">
+                <NetworkSwitch />
+
+                <AddressDisplay :address="data.safeAddress" />
+            </div>
             <ProfileSettings />
+
         </div>
 
         <!-- 资产总览 -->
@@ -42,8 +47,8 @@
         <!-- 分割线 -->
         <div class="w-full border-t border-muted my-4"></div>
 
-         <!-- 加载动画 -->
-         <div class="flex flex-col gap-4 mt-4" v-if="loading">
+        <!-- 加载动画 -->
+        <div class="flex flex-col gap-4 mt-4" v-if="loading">
             <div class="w-full h-10 rounded-lg loading-bg"></div>
             <div class="w-80 h-10 rounded-lg loading-bg"></div>
             <div class="w-full h-10 rounded-lg loading-bg"></div>
@@ -54,8 +59,7 @@
         <div class="flex flex-col flex-1  overflow-y-auto" v-else>
             <!-- 主链资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                @click="navigateTo('/send')"
-            >
+                @click="navigateTo('/send')">
                 <div class="flex items-center gap-3">
                     <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
                     <div>
@@ -70,8 +74,7 @@
 
             <!-- 代币资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                v-for="balance in balances"
-                @click="navigateTo(`/senderc20/${balance.token.address}`)"
+                v-for="balance in balances" @click="navigateTo(`/senderc20/${balance.token.address}`)"
                 :key="balance.token.address">
                 <div class="flex items-center gap-3">
                     <img :src="balance.token.icon" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />
@@ -106,12 +109,14 @@ const data = reactive({
     balance: BigInt(0)
 })
 
-onMounted(async () => {
+const network = computed(() => useChain.chain)
+
+const handleGetData = async () => {
     try {
         loading.value = true
         data.safeAddress = user.value?.evm_chain_address as string
-        data.balance = await getBalance(user.value?.evm_chain_address as `0x${string}`, useChain.chain)
-        balances.value = await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, useChain.chain)
+        data.balance = await getBalance(user.value?.evm_chain_address as `0x${string}`, network.value)
+        balances.value = await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, network.value)
     } catch (error) {
         console.error(error)
         toast.add({
@@ -122,5 +127,10 @@ onMounted(async () => {
     } finally {
         loading.value = false
     }
-})
+}
+
+watch([user, network], () => {
+    handleGetData()
+}, { immediate: true })
+
 </script>
