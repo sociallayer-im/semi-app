@@ -30,7 +30,7 @@
                 </div>
                 <span class="text-sm mt-1">接收</span>
             </div>
-            <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/send')">
+            <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/transfer')">
                 <div class="bg-purple-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:external-link" size="24" class="text-purple-500" />
                 </div>
@@ -59,7 +59,7 @@
         <div class="flex flex-col flex-1  overflow-y-auto" v-else>
             <!-- 主链资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                @click="navigateTo('/send')">
+                @click="navigateTo('/transfer')">
                 <div class="flex items-center gap-3">
                     <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
                     <div>
@@ -74,7 +74,7 @@
 
             <!-- 代币资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                v-for="balance in balances" @click="navigateTo(`/senderc20/${balance.token.address}`)"
+                v-for="balance in balances" @click="navigateTo(`/transfer?token_address=${balance.token.address}`)"
                 :key="balance.token.address">
                 <div class="flex items-center gap-3">
                     <img :src="balance.token.icon" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />

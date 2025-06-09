@@ -38,9 +38,12 @@ export const useChainStore = defineStore('chain', {
     
     actions: {
         async switch(chainId: number) {
-            this.chain = chainMap[chainId]
-            // 只保存链的 ID
-            localStorage.setItem(STORAGE_KEY, chainId.toString())
+            if (chainMap[chainId]) {
+                this.chain = chainMap[chainId]
+                localStorage.setItem(STORAGE_KEY, chainId.toString())
+            } else {
+                console.warn(`Chain ${chainId} not supported`)
+            }
         }
     }
 }) 
