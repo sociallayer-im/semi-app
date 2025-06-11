@@ -23,7 +23,7 @@
         </div>
 
         <!-- 活动记录列表 -->
-        <UTabs :items="tabs" class="w-full" v-else>
+        <UTabs :items="tabs" class="w-full overflow-auto" v-else>
             <template #send="{ item }">
                 <div class="text-gray-400 text-sm" v-if="sendActions.length === 0">当前没有数据</div>
 

@@ -1,8 +1,8 @@
 import type { Address, Chain } from "viem"
 
 import { prepareClient } from "./utils/prepareClient"
-import { getSafeAccount } from "./account"
-import { erc20Abi, parseEther } from "viem"
+import { getSafeAccount, getVirtualSafeAccount } from "./account"
+import { erc20Abi, parseEther, zeroAddress } from "viem"
 import { BUNDLER_URL } from "../config"
 
 
@@ -11,7 +11,8 @@ export interface TransferOptions {
     amount: string
     erc20TokenAddress?: Address
     privateKey: `0x${string}`
-    chain: Chain
+    chain: Chain,
+    sponsorFee: boolean
 }
 
 interface GasPrice {
@@ -19,13 +20,39 @@ interface GasPrice {
     maxPriorityFeePerGas: bigint
 }
 
+export interface TransactionReceipt {
+    actualGasCost: bigint
+    actualGasUsed: bigint
+    entryPoint: string
+    logs: any[]
+    nonce: string,
+    receipt: {
+        blockHash: string
+        blockNumber: bigint
+        contractAddress: string | null
+        cumulativeGasUsed: bigint
+        effectiveGasPrice: bigint
+        from: string
+        gasUsed: string
+        logs: any[]
+        logsBloom: string
+        status: string
+        to: string
+        transactionHash: string
+        transactionIndex: number
+    }
+    sender: string
+    success: boolean
+    userOpHash: string
+}
+
 const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundlerClient: any) => {
-    if (chain.id !== 10 && chain.id !== 1) return null
+    // if (chain.id !== 10 && chain.id !== 1) return null
 
     const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
     console.log('[Gas Price]:', {
         maxFeePerGas: gasPrice.maxFeePerGas.toString(),
-        maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas.toString()
+        maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas.toString(),
     })
 
     const gas = await bundlerClient.estimateUserOperationGas({
@@ -40,10 +67,8 @@ const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundle
     })
 
     return {
-        maxFeePerGas: gasPrice.maxFeePerGas,
-        maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
-        preVerificationGas: gas.preVerificationGas,
-        verificationGasLimit: gas.verificationGasLimit,
+        ...gasPrice,
+        ...gas,
     }
 }
 
@@ -51,20 +76,20 @@ const executeUserOperation = async (params: any, bundlerClient: any) => {
     try {
         const hash = await bundlerClient.sendUserOperation(params)
         console.log('[UserOperation Hash]:', hash)
-        
+
         const receipt = await bundlerClient.waitForUserOperationReceipt({ hash })
         console.log('[UserOperation Receipt]:', receipt)
-        
-        return receipt
+
+        return receipt as TransactionReceipt
     } catch (error: unknown) {
         console.error('[UserOperation Error]:', error)
         throw new Error(`Failed to execute user operation: ${error instanceof Error ? error.message : String(error)}`)
     }
 }
 
-export const transfer = async ({ to, amount, privateKey, chain }: TransferOptions) => {
+export const transfer = async ({ to, amount, privateKey, chain, sponsorFee }: TransferOptions) => {
     const smartAccount = await getSafeAccount(privateKey, chain)
-    const { bundlerClient } = await prepareClient(chain)
+    const { bundlerClient } = await prepareClient(chain, sponsorFee)
 
     const tx = {
         to,
@@ -84,13 +109,13 @@ export const transfer = async ({ to, amount, privateKey, chain }: TransferOption
     return executeUserOperation(params, bundlerClient)
 }
 
-export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenAddress }: TransferOptions) => {
+export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenAddress, sponsorFee }: TransferOptions) => {
     if (!erc20TokenAddress) {
         throw new Error('ERC20 token address is required')
     }
 
     const smartAccount = await getSafeAccount(privateKey, chain)
-    const { publicClient, bundlerClient } = await prepareClient(chain)
+    const { publicClient, bundlerClient } = await prepareClient(chain, sponsorFee)
 
     const decimals = await publicClient.readContract({
         address: erc20TokenAddress,
@@ -140,7 +165,7 @@ export const pimlicoGetUserOperationGasPrice = async (chain: Chain): Promise<Gas
         }
 
         const data = await response.json()
-        
+
         if (data.error) {
             throw new Error(`RPC error: ${data.error.message}`)
         }
@@ -153,4 +178,43 @@ export const pimlicoGetUserOperationGasPrice = async (chain: Chain): Promise<Gas
         console.error('[Gas Price Error]:', error)
         throw new Error(`Failed to get gas price: ${error instanceof Error ? error.message : String(error)}`)
     }
+}
+
+export interface EstimateGasOptions extends Omit<TransferOptions, 'privateKey'> {
+    safeAccountAddress: Address,
+}
+
+export const estimateGas = async ({ to, amount, safeAccountAddress, chain, erc20TokenAddress, sponsorFee }: EstimateGasOptions) => {
+    const smartAccount = await getVirtualSafeAccount(safeAccountAddress, chain)
+    const { publicClient, bundlerClient } = await prepareClient(chain, sponsorFee)
+
+    console.log('[Smart Account]:', erc20TokenAddress)
+
+    let tx: any
+    if (!!erc20TokenAddress && erc20TokenAddress !== zeroAddress) {
+        const decimals = await publicClient.readContract({
+            address: erc20TokenAddress,
+            abi: erc20Abi,
+            functionName: 'decimals',
+        })
+        const amountWithDecimals = BigInt(Number(amount) * 10 ** decimals)
+        tx = {
+            abi: erc20Abi,
+            functionName: 'transfer',
+            args: [to, amountWithDecimals],
+            to: erc20TokenAddress,
+        } as const
+    } else {
+        tx = {
+            to,
+            value: parseEther(amount)
+        } as const
+    }
+
+    const params = {
+        account: smartAccount,
+        calls: [tx],
+    }
+
+    return await getGasParameters(chain, smartAccount, tx, bundlerClient)
 }

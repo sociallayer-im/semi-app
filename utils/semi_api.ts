@@ -1,4 +1,5 @@
 import { sha256 } from 'viem/utils'
+import type { TransactionReceipt } from './SafeSmartAccount/operation';
 
 
 // API 响应的基础接口
@@ -32,6 +33,11 @@ interface SignInResponse extends BaseResponse {
 // 加密密钥响应接口
 interface EncryptedKeysResponse extends BaseResponse {
     encrypted_keys: string;
+}
+
+// 剩余免手续费交易次数响应接口
+interface RemainingGasCreditsResponse extends BaseResponse {
+    remaining_free_transactions: number;
 }
 
 // API 基础配置
@@ -114,7 +120,7 @@ export async function sendSMS(phone: string): Promise<BaseResponse> {
             message: '验证码已发送',
         } as BaseResponse
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/send_sms`, {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -138,7 +144,7 @@ export async function signIn(phone: string, code: string): Promise<SignInRespons
         setAuthToken('1234567890');
         return moc_response
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/signin`, {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -173,7 +179,7 @@ export async function setImageUrl(id: string, image_url: string): Promise<BaseRe
 
 // 6. 设置加密密钥
 
-export interface SetEncryptedKeysProps  {
+export interface SetEncryptedKeysProps {
     id: string;
     encrypted_keys: string;
     evm_chain_address: string;
@@ -211,7 +217,7 @@ export async function getUser(id: string): Promise<UserInfo> {
     if (MOCK_RESPONSE) {
         return moc_response
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/get_user?id=${id}`, {
         headers: getAuthHeaders(),
     });
@@ -235,20 +241,20 @@ export async function setEvmChainAddress(id: string, evm_chain_address: string, 
     return handleRequest<BaseResponse>(response);
 }
 
-export async function signinWithPassword(phone: string, password: string, ) {
+export async function signinWithPassword(phone: string, password: string,) {
     const encoder = new TextEncoder();
     const bytes = encoder.encode(password);
     const hax = sha256(bytes)
     console.log('password_hash', hax)
-    
+
     const response = await fetch(`${API_BASE_URL}/signin_with_password`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ phone, password: hax}),
+        body: JSON.stringify({ phone, password: hax }),
     });
 
     const data = await handleRequest<SignInResponse>(response);
-    
+
     if (data.auth_token) {
         setAuthToken(data.auth_token);
     }
@@ -256,3 +262,43 @@ export async function signinWithPassword(phone: string, password: string, ) {
     return data;
 }
 
+// 查询剩余免手续费交易次数
+export async function getRemainingGasCredits(): Promise<RemainingGasCreditsResponse> {
+    const response = await fetch(`${API_BASE_URL}/remaining_free_transactions`, {
+        headers: getAuthHeaders(),
+    });
+    return handleRequest<RemainingGasCreditsResponse>(response);
+}
+
+// 上传交易记录
+
+
+export interface TransactionRecord {
+    tx_hash: string;
+    gas_used: string;
+    status: string,
+    chain: number,
+    data: string  // TransactionReceipt 的 JSON 字符串
+}
+
+export async function uploadTransaction(transaction: TransactionRecord): Promise<BaseResponse> {
+    const response = await fetch(`${API_BASE_URL}/add_transaction`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(transaction),
+    });
+    return handleRequest<BaseResponse>(response);
+}
+
+// 获取交易记录
+export interface TransactionRecordResponse extends BaseResponse {
+    transactions: TransactionRecord[];
+}
+
+export async function getTransactions(): Promise<BaseResponse> {
+    const response = await fetch(`${API_BASE_URL}/get_transactions`, {
+        headers: getAuthHeaders(),
+    });
+
+    return handleRequest<TransactionRecordResponse>(response);
+}
