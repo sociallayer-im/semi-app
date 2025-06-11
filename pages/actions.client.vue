@@ -79,7 +79,7 @@
 import { useUserStore } from '../stores/user'
 import { useChainStore } from '../stores/chain'
 import type { Chain } from 'viem'
-import { formatAddress, displayDate, displayBalance } from '../utils/display'
+import { formatAddress, displayDate, displayBalance, type ActionPreview } from '../utils/display'
 import { getReceiveActions, getSendActionsV2 } from '../utils/actions'
 import type { TabsItem } from '@nuxt/ui'
 

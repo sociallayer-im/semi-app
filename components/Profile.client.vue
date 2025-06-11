@@ -116,7 +116,8 @@ const handleGetData = async () => {
         loading.value = true
         data.safeAddress = user.value?.evm_chain_address as string
         data.balance = await getBalance(user.value?.evm_chain_address as `0x${string}`, network.value)
-        balances.value = await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, network.value)
+        balances.value = (await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, network.value))
+            .sort((a, b) => Number(b.balance - a.balance))
     } catch (error) {
         console.error(error)
         toast.add({
