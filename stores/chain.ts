@@ -19,7 +19,7 @@ export const chainMap: Record<number, ChainWithIcon> = {
     },
     [sepolia.id]: {
         ...sepolia,
-        icon: '/images/eth_logo.png'
+        icon: '/images/sepolia_logo.png'
     },
 }
 

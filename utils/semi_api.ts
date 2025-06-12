@@ -256,3 +256,10 @@ export async function signinWithPassword(phone: string, password: string, ) {
     return data;
 }
 
+export async function getUserByHandle(handle: string): Promise<UserInfo> {
+    const response = await fetch(`${API_BASE_URL}/get_by_handle?handle=${handle}`, {
+        headers: getAuthHeaders(),
+    });
+    return handleRequest<UserInfo>(response);
+}
+

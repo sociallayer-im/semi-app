@@ -15,7 +15,6 @@ export const useUserStore = defineStore('user', {
               const user = await getMe()
               this.user = user
             }
-
             return null
         },
         async signout() {
