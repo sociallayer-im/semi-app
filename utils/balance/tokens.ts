@@ -24,7 +24,7 @@ export const POPULAR_ERC20_TOKENS: PopularTokenList = {
         name: 'NT',
         symbol: 'NT',
         address: '0x7563cb33148cD2b929ed85e69F697be13b515Bd0',
-        icon: 'https://ik.imagekit.io/soladata/kg8ddpwy_r5he8h1o9',
+        icon: '/images/nantang_token.png',
         decimals: 18
     }, {
         name: 'WX',

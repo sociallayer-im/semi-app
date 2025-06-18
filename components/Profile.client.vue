@@ -11,17 +11,6 @@
 
         </div>
 
-        <!-- 资产总览 -->
-        <div class="w-full flex items-center justify-between mb-2">
-            <div>
-                <div class="text-gray-400 text-sm">余额</div>
-                <div class="flex items-center gap-2">
-                    <span class="text-3xl font-bold">{{ displayBalance(data.balance) }} {{
-                        useChain.chain.nativeCurrency.symbol }}</span>
-                </div>
-            </div>
-        </div>
-
         <!-- 操作按钮 -->
         <div class="w-full flex justify-around my-4">
             <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/receive')">
@@ -59,6 +48,7 @@
         <div class="flex flex-col flex-1  overflow-y-auto" v-else>
             <!-- 主链资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
+                v-if="data.balance !== BigInt(0)"
                 @click="navigateTo('/transfer')">
                 <div class="flex items-center gap-3">
                     <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
