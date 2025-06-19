@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { useUserStore } from '~/stores/user'
-import { decryptKeystoreToMnemonic, mnemonicToPrivateKey } from '~/utils/encryption'
+import { decryptKeystoreToMnemonic, keystoreToPrivateKey } from '~/utils/encryption'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -62,10 +62,6 @@ const loading = ref(false)
 const showPrivateKey = ref(false)
 const privateKey = ref('')
 const toast = useToast()
-
-definePageMeta({
-    layout: 'unauth'
-})
 
 const formState = reactive({
     pin: Array(6).fill('')
@@ -83,14 +79,12 @@ const onSubmit = async () => {
             throw new Error('未找到加密的密钥信息')
         }
 
-        // 解密助记词
-        const mnemonic = await decryptKeystoreToMnemonic(
+        // 获取私钥
+        privateKey.value = await keystoreToPrivateKey(
             JSON.parse(user.encrypted_keys),
             formState.pin.join('')
         )
-
-        // 从助记词获取私钥
-        privateKey.value = mnemonicToPrivateKey(mnemonic)
+        console.log('privateKey', privateKey.value)
         showPrivateKey.value = true
 
     } catch (error) {

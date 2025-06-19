@@ -1,4 +1,4 @@
-import { mnemonicToAccount, generateMnemonic, english } from 'viem/accounts'
+import { mnemonicToAccount, generateMnemonic, english, privateKeyToAccount } from 'viem/accounts'
 
 // Generate a BIP39 mnemonic
 export function generateMnemonicPhrase() {
@@ -135,4 +135,18 @@ export async function signTransaction(mnemonic: string, tx: any) {
 export function mnemonicToPrivateKey(mnemonic: string) {
   const account = mnemonicToAccount(mnemonic)
   return '0x' + toHex(account.getHdKey().privateKey as any)
+}
+
+export function privateKeyToSafeAccount(privateKey: `0x${string}`) {
+  const account = privateKeyToAccount(privateKey)
+  return account.address
+}
+
+export async function keystoreToPrivateKey(keystore: Keystore, passcode: string) {
+  const decrypted = await decryptKeystoreToMnemonic(keystore, passcode)
+  if (isPrivateKey(decrypted)) {
+    return decrypted
+  } else {
+    return mnemonicToPrivateKey(decrypted)
+  }
 }
