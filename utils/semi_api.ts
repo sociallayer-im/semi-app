@@ -263,3 +263,15 @@ export async function getUserByHandle(handle: string): Promise<UserInfo> {
     return handleRequest<UserInfo>(response);
 }
 
+export async function getUserByHandleOrPhone(handleOrPhone: string): Promise<UserInfo | null> {
+    const response = await fetch(`${API_BASE_URL}/get_by_handle?handle=${handleOrPhone}`, {
+        headers: getAuthHeaders(),
+    });
+
+    try {
+        return await handleRequest<UserInfo | null>(response);
+    } catch (error) {
+        return null
+    }
+}
+

@@ -10,10 +10,10 @@
             <!-- 步骤1：输入转账信息 -->
             <div v-if="step === 1" class="w-full">
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
-                    <UFormField name="to" label="接收地址">
+                    <UFormField name="to" label="接收人(支持地址或手机号)">
                         <div class="flex items-start flex-row gap-2">
                             <UTextarea size="xl" class="w-full" variant="subtle" v-model="formState.to"
-                                placeholder="请输入接收地址" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                                placeholder="请输入接收地址/手机号" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                             <div class="flex flex-col gap-2">
                                 <UButton icon="ci:close-md" color="neutral" variant="subtle" size="xl"
                                     class="text-2xl cursor-pointer" @click="formState.to = ''">
@@ -88,6 +88,7 @@ import { displayBalance } from '~/utils/display'
 import { isAddress, zeroAddress } from 'viem'
 import { decryptKeystoreToMnemonic, mnemonicToPrivateKey } from '~/utils/encryption'
 import type { TokenMetadata } from '@/utils/balance/tokens'
+import { isPhoneNumber } from '~/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,9 +177,11 @@ const formState = reactive<{
     to: string,
     amount: string,
     code: string[],
+    recipient: `0x${string}` | null,
     token: TokenMetadata | undefined
 }>({
-    to: '',
+    to: '18318197777',
+    recipient: null,
     amount: '',
     code: Array(6).fill(''),
     token: undefined
@@ -187,7 +190,7 @@ const formState = reactive<{
 // 表单验证
 const isFormValid = computed(() => {
     if (!formState.to || !formState.amount) return false
-    if (!isAddress(formState.to)) return false
+    if (!isAddress(formState.to) && !isPhoneNumber(formState.to)) return false
     if (isNaN(Number(formState.amount)) || Number(formState.amount) <= 0) return false
     return true
 })
@@ -235,9 +238,11 @@ const fetchTokenBalance = async () => {
 // 统一的转账函数
 const handleTokenTransfer = async () => {
     if (!formState.token) return
+    if (!formState.recipient) return
 
     loading.value = true
     try {
+
         const mnemonic = await decryptKeystoreToMnemonic(
             JSON.parse(user.user?.encrypted_keys as string),
             formState.code.join('')
@@ -245,7 +250,7 @@ const handleTokenTransfer = async () => {
         const privateKey = await mnemonicToPrivateKey(mnemonic)
 
         const transferParams = {
-            to: formState.to as `0x${string}`,
+            to: formState.recipient,
             amount: formState.amount,
             privateKey: privateKey as `0x${string}`,
             chain: useChain.chain,
@@ -285,6 +290,27 @@ const onSubmit = async () => {
             })
             return
         }
+
+        loading.value = true
+        try {
+            if (isPhoneNumber(formState.to)) {
+                const phone = formState.to
+                const recipient = await getUserByHandleOrPhone(phone)
+                if (!recipient || !recipient.evm_chain_address) {
+                    toast.add({
+                        title: '无效手机号',
+                        description: '手机号不存在',
+                        color: 'error'
+                    })
+                    return
+                }
+                formState.recipient = recipient.evm_chain_address as `0x${string}`
+            } else {
+                formState.recipient = formState.to as `0x${string}`
+            }
+        } finally {
+            loading.value = false
+        }
         step.value = 2
         return
     }
@@ -294,6 +320,7 @@ const onSubmit = async () => {
 
 const handleReset = () => {
     step.value = 1
+    formState.recipient = null
     formState.code = Array(6).fill('')
 }
 
