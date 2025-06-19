@@ -12,7 +12,7 @@ const checkUser = (user: UserInfo | null) => {
         router.push('/set-name')
     } else if (!!user && !user.evm_chain_active_key) {
         console.log('[layout]:go to set payment code')
-        router.push('/paymentcode')
+        router.push('/init')
     }
 }
 
@@ -28,7 +28,7 @@ watch(() => userStore.user, (newUser, oldUser) => {
 const showContent = computed(() => {
     const userLoggedIn = !!userStore.user
     const userReady = !!userStore.user?.handle && !!userStore.user?.evm_chain_active_key
-    const isOnSettingPage = ['/set-name', '/paymentcode'].includes(router.currentRoute.value.path)
+    const isOnSettingPage = ['/set-name', '/paymentcode', '/import', '/init'].includes(router.currentRoute.value.path)
     console.log('[layout]:showContent', {userLoggedIn, userReady, isOnSettingPage})
     return userLoggedIn && (userReady || isOnSettingPage)
 })

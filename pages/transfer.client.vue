@@ -86,7 +86,7 @@ import { getBalance, getErc20Balance } from '~/utils/balance'
 import { predictSafeAccountAddress, transfer, transferErc20 } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
 import { isAddress, zeroAddress } from 'viem'
-import { decryptKeystoreToMnemonic, mnemonicToPrivateKey } from '~/utils/encryption'
+import { decryptKeystoreToMnemonic, keystoreToPrivateKey } from '~/utils/encryption'
 import type { TokenMetadata } from '@/utils/balance/tokens'
 import { isPhoneNumber } from '~/utils'
 
@@ -180,7 +180,7 @@ const formState = reactive<{
     recipient: `0x${string}` | null,
     token: TokenMetadata | undefined
 }>({
-    to: '18318197777',
+    to: '',
     recipient: null,
     amount: '',
     code: Array(6).fill(''),
@@ -242,12 +242,10 @@ const handleTokenTransfer = async () => {
 
     loading.value = true
     try {
-
-        const mnemonic = await decryptKeystoreToMnemonic(
+        const privateKey = await keystoreToPrivateKey(
             JSON.parse(user.user?.encrypted_keys as string),
             formState.code.join('')
         )
-        const privateKey = await mnemonicToPrivateKey(mnemonic)
 
         const transferParams = {
             to: formState.recipient,
