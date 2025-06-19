@@ -180,7 +180,7 @@ const formState = reactive<{
     recipient: `0x${string}` | null,
     token: TokenMetadata | undefined
 }>({
-    to: '18318197777',
+    to: '',
     recipient: null,
     amount: '',
     code: Array(6).fill(''),
