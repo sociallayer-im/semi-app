@@ -48,7 +48,6 @@
         <div class="flex flex-col flex-1  overflow-y-auto" v-else>
             <!-- 主链资产 -->
             <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-                v-if="data.balance !== BigInt(0)"
                 @click="navigateTo('/transfer')">
                 <div class="flex items-center gap-3">
                     <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
