@@ -61,6 +61,7 @@ const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundle
         maxFeePerGas: gasPrice.maxFeePerGas,
         maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
     })
+
     console.log('[Gas Estimate]:', {
         preVerificationGas: gas.preVerificationGas.toString(),
         verificationGasLimit: gas.verificationGasLimit.toString()
