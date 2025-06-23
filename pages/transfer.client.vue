@@ -10,10 +10,10 @@
             <!-- 步骤1：输入转账信息 -->
             <div v-if="step === 1" class="w-full">
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
-                    <UFormField name="to" label="接收地址">
+                    <UFormField name="to" label="接收人(支持地址或手机号)">
                         <div class="flex items-start flex-row gap-2">
                             <UTextarea size="xl" class="w-full" variant="subtle" v-model="formState.to"
-                                placeholder="请输入接收地址" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
+                                placeholder="请输入接收地址/手机号" :ui="{ base: 'w-full' }" :disabled="loading || !balance" />
                             <div class="flex flex-col gap-2">
                                 <UButton icon="ci:close-md" color="neutral" variant="subtle" size="xl"
                                     class="text-2xl cursor-pointer" @click="formState.to = ''">
@@ -108,9 +108,10 @@ import { useUserStore } from '@/stores/user'
 import { getBalance, getErc20Balance } from '~/utils/balance'
 import { estimateGas, predictSafeAccountAddress, transfer, transferErc20 } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
-import { isAddress, zeroAddress, formatUnits } from 'viem'
-import { decryptKeystoreToMnemonic, mnemonicToPrivateKey } from '~/utils/encryption'
+import { isAddress, zeroAddress } from 'viem'
+import { decryptKeystoreToMnemonic, keystoreToPrivateKey } from '~/utils/encryption'
 import type { TokenMetadata } from '@/utils/balance/tokens'
+import { isPhoneNumber } from '~/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -213,12 +214,10 @@ const tokenList = computed(() => {
     return [nativeToken.value, ...erc20TokenList]
 })
 
-
-
 // 表单验证
 const isFormValid = computed(() => {
     if (!formState.to || !formState.amount) return false
-    if (!isAddress(formState.to)) return false
+    if (!isAddress(formState.to) && !isPhoneNumber(formState.to)) return false
     if (isNaN(Number(formState.amount)) || Number(formState.amount) <= 0) return false
     return true
 })
@@ -266,17 +265,17 @@ const fetchTokenBalance = async () => {
 // 统一的转账函数
 const handleTokenTransfer = async () => {
     if (!formState.token) return
+    if (!formState.recipient) return
 
     loading.value = true
     try {
-        const mnemonic = await decryptKeystoreToMnemonic(
+        const privateKey = await keystoreToPrivateKey(
             JSON.parse(user.user?.encrypted_keys as string),
             formState.code.join('')
         )
-        const privateKey = await mnemonicToPrivateKey(mnemonic)
 
         const transferParams = {
-            to: formState.to as `0x${string}`,
+            to: formState.recipient,
             amount: formState.amount,
             privateKey: privateKey as `0x${string}`,
             chain: useChain.chain,
@@ -332,9 +331,37 @@ const onSubmit = async () => {
             return
         }
 
-        step2Loading.value = true
-        let remainingFreeTransactions = 0
-        step2Error.value = ''
+      let remainingFreeTransactions = 0
+      step2Error.value = ''
+      step2Loading.value = true
+      try {
+        if (isPhoneNumber(formState.to)) {
+          const phone = formState.to
+          const recipient = await getUserByHandleOrPhone(phone)
+          if (!recipient || !recipient.evm_chain_address) {
+            toast.add({
+              title: '无效手机号',
+              description: '手机号不存在',
+              color: 'error'
+            })
+            return
+          }
+          formState.recipient = recipient.evm_chain_address as `0x${string}`
+        } else {
+          formState.recipient = formState.to as `0x${string}`
+        }
+      } catch {
+        loading.value = false
+        console.error(error)
+        toast.add({
+          title: '估算gas费用失败',
+          description: getErrorMessage(error),
+          color: 'error'
+        })
+        return
+      }
+
+
         // 获取剩余免手续费交易次数
         try {
             if (isGasSponsorshipChain(useChain.chain.id)) {
@@ -346,12 +373,12 @@ const onSubmit = async () => {
         } catch (error) {
             step2Loading.value = false
             console.error(error)
-            step2Error.value = error instanceof Error ? error.message : '请稍后再试'
             toast.add({
                 title: '获取免手续费交易次数失败',
                 description: '请稍后再试',
                 color: 'error'
             })
+          return
         }
 
         // 估算gas费用
@@ -383,17 +410,15 @@ const onSubmit = async () => {
                     ? '账户余额不足以支付手续费'
                     : error.message
             }
-            step2Error.value = getErrorMessage(error)
             toast.add({
                 title: '估算gas费用失败',
                 description: getErrorMessage(error),
                 color: 'error'
             })
+          return
         }
 
-        step2Loading.value = false
-        step.value = 2
-        return
+       step.value = 2
     }
 
     await handleTokenTransfer()
@@ -401,6 +426,7 @@ const onSubmit = async () => {
 
 const handleReset = () => {
     step.value = 1
+    formState.recipient = null
     formState.code = Array(6).fill('')
 }
 

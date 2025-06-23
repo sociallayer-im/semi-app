@@ -102,21 +102,14 @@ const onSubmit = async () => {
         if (validation === true) {
             const response = await signIn(phone.value, formState.pin.join(''))
             if (response.result === 'ok') {
+                const user = await getMe()
+                userStore.setUser(user)
                 toast.add({
                     title: '验证成功',
-                    description: '正在跳转到首页',
+                    description: '',
                     color: 'success'
                 })
 
-                const user = await getMe()
-                console.log('[user]:', user)
-
-                if (!user.encrypted_keys) {
-                    router.replace('/paymentcode')
-                    return
-                }
-
-                userStore.setUser(user)
                 await router.push('/')
             }
         } else {

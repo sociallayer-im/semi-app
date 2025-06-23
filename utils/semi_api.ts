@@ -270,9 +270,6 @@ export async function getRemainingGasCredits(): Promise<RemainingGasCreditsRespo
     return handleRequest<RemainingGasCreditsResponse>(response);
 }
 
-// 上传交易记录
-
-
 export interface TransactionRecord {
     tx_hash: string;
     gas_used: string;
@@ -281,6 +278,7 @@ export interface TransactionRecord {
     data: string  // TransactionReceipt 的 JSON 字符串
 }
 
+// 上传交易记录
 export async function uploadTransaction(transaction: TransactionRecord): Promise<BaseResponse> {
     const response = await fetch(`${API_BASE_URL}/add_transaction`, {
         method: 'POST',
@@ -301,4 +299,23 @@ export async function getTransactions(): Promise<BaseResponse> {
     });
 
     return handleRequest<TransactionRecordResponse>(response);
+}
+
+export async function getUserByHandle(handle: string): Promise<UserInfo> {
+    const response = await fetch(`${API_BASE_URL}/get_by_handle?handle=${handle}`, {
+        headers: getAuthHeaders(),
+    });
+    return handleRequest<UserInfo>(response);
+}
+
+export async function getUserByHandleOrPhone(handleOrPhone: string): Promise<UserInfo | null> {
+    const response = await fetch(`${API_BASE_URL}/get_by_handle?handle=${handleOrPhone}`, {
+        headers: getAuthHeaders(),
+    });
+
+    try {
+        return await handleRequest<UserInfo | null>(response);
+    } catch (error) {
+        return null
+    }
 }
