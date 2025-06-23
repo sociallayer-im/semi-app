@@ -12,13 +12,13 @@ export interface PopularTokenList {
 
 export const POPULAR_ERC20_TOKENS: PopularTokenList = {
   1: [
-    {
-      name: "Tether USD",
-      symbol: "USDT",
-      address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      icon: "https://ik.imagekit.io/soladata/cgqauykb_v936bf9G5",
-      decimals: 6,
-    },
+    // {
+    //   name: "Tether USD",
+    //   symbol: "USDT",
+    //   address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    //   icon: "https://ik.imagekit.io/soladata/cgqauykb_v936bf9G5",
+    //   decimals: 6,
+    // },
   ],
   10: [
     {
@@ -53,7 +53,7 @@ export const POPULAR_ERC20_TOKENS: PopularTokenList = {
   11155111: [
     {
       name: "USDC",
-      symbol: "USDC",
+      symbol: "Test erc20 token",
       address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
       decimals: 6,
       icon: "https://ik.imagekit.io/soladata/57yobknk_WoLp8Wvot",
