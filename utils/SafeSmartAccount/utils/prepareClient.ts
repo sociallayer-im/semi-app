@@ -26,7 +26,7 @@ export const prepareClient = async (chain: Chain, sponsorFee: boolean) => {
     const bundlerClient = createBundlerClient({
         chain,
         transport: http(bundlerUrl),
-        paymaster: paymasterClient
+        paymaster: paymasterClient,
     })
 
     return {

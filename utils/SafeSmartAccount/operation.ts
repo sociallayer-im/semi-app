@@ -2,8 +2,9 @@ import type { Address, Chain } from "viem"
 
 import { prepareClient } from "./utils/prepareClient"
 import { getSafeAccount, getVirtualSafeAccount } from "./account"
-import { erc20Abi, parseEther, zeroAddress } from "viem"
-import { BUNDLER_URL } from "../config"
+import { erc20Abi, parseEther, toBytes, bytesToHex ,zeroAddress } from "viem"
+import { BUNDLER_URL, CREATE_CALL_CONTRACT } from "../config"
+import CreateCallAbi from "../deploy/CreateCall.abi.json"
 
 
 export interface TransferOptions {
@@ -46,7 +47,18 @@ export interface TransactionReceipt {
     userOpHash: string
 }
 
-const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundlerClient: any) => {
+export interface GetGasParametersOptionsBase {
+    chain: Chain
+    smartAccount: any
+    bundlerClient: any
+}
+
+export type GetGasParametersOptions = GetGasParametersOptionsBase & (
+    { callData: `0x${string}`; tx?: never } | 
+    { tx: any; callData?: never }
+);
+
+const getGasParameters = async ({ chain, smartAccount, tx, callData, bundlerClient }: GetGasParametersOptions) => {
     // if (chain.id !== 10 && chain.id !== 1) return null
 
     const gasPrice = await pimlicoGetUserOperationGasPrice(chain)
@@ -55,9 +67,14 @@ const getGasParameters = async (chain: Chain, smartAccount: any, tx: any, bundle
         maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas.toString(),
     })
 
-    const gas = await bundlerClient.estimateUserOperationGas({
+    const gas = !!tx ? await bundlerClient.estimateUserOperationGas({
         account: smartAccount,
         calls: [tx],
+        maxFeePerGas: gasPrice.maxFeePerGas,
+        maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
+    }) : await bundlerClient.estimateUserOperationGas({
+        account: smartAccount,
+        callData,
         maxFeePerGas: gasPrice.maxFeePerGas,
         maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas,
     })
@@ -102,7 +119,7 @@ export const transfer = async ({ to, amount, privateKey, chain, sponsorFee }: Tr
         calls: [tx],
     }
 
-    const gasParams = await getGasParameters(chain, smartAccount, tx, bundlerClient)
+    const gasParams = await getGasParameters({ chain, smartAccount, tx, bundlerClient })
     if (gasParams) {
         Object.assign(params, gasParams)
     }
@@ -138,7 +155,7 @@ export const transferErc20 = async ({ to, amount, privateKey, chain, erc20TokenA
         calls: [tx],
     }
 
-    const gasParams = await getGasParameters(chain, smartAccount, tx, bundlerClient)
+    const gasParams = await getGasParameters({ chain, smartAccount, tx, bundlerClient })
     if (gasParams) {
         Object.assign(params, gasParams)
     }
@@ -217,5 +234,40 @@ export const estimateGas = async ({ to, amount, safeAccountAddress, chain, erc20
         calls: [tx],
     }
 
-    return await getGasParameters(chain, smartAccount, tx, bundlerClient)
+    return await getGasParameters({ chain, smartAccount, tx, bundlerClient })
+}
+
+export interface DeployOptions  {
+    privateKey: `0x${string}`
+    chain: Chain
+    callData: `0x${string}`
+    sponsorFee?: boolean
+}
+
+export const deploy = async ({ privateKey, chain, callData, sponsorFee=false }: DeployOptions) => {
+    const smartAccount = await getSafeAccount(privateKey, chain)
+    const { bundlerClient } = await prepareClient(chain, sponsorFee)
+
+    const tx = {
+        abi: CreateCallAbi,
+        functionName: 'performCreate2',
+        args: [
+            '0', 
+            callData, 
+            bytesToHex(toBytes(new Date().getTime().toString()), { size: 32 })
+        ],
+        to: CREATE_CALL_CONTRACT[chain.id],
+    } as const
+
+    const params = {
+        account: smartAccount,
+        calls: [tx],
+    }
+
+    const gasParams = await getGasParameters({ chain, smartAccount, tx, bundlerClient })
+    if (gasParams) {
+        Object.assign(params, gasParams)
+    }
+
+    return executeUserOperation(params, bundlerClient)
 }

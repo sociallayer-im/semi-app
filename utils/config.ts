@@ -102,3 +102,9 @@ export const RPC_URL: RPCUrl = {
 export const PAYMASTER_URL: PaymasterUrl = {
     10: import.meta.env.VITE_OP_PAYMASTER
 }
+
+export const CREATE_CALL_CONTRACT: RPCUrl = {
+    1: '0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4',
+    10: '0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4',
+    11155111: '0x7cbB62EaA69F79e6873cD1ecB2392971036cFAa4',
+}
