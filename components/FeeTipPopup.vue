@@ -1,8 +1,12 @@
 <template>
-    <UModal title="预估手续费">
+    <UModal :title="i18n.text['Estimated Fee']">
         <UIcon name="i-ci-info" size="18" class="cursor-pointer hover:text-primary-500" />
         <template #body>
-            <div class="text-sm">包含支付给bundler和paymaster的费用。是一个大概值，以交易完成后最终的gas使用情况为准。</div>
+            <div class="text-sm">{{ i18n.text['Includes fees paid to bundler and paymaster. This is an approximate value, subject to the final gas usage after transaction completion.'] }}</div>
         </template>
     </UModal>
 </template>
+
+<script setup>
+const i18n = useI18n();
+</script>

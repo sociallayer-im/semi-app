@@ -17,19 +17,19 @@
                 <div class="bg-green-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:qr-code" size="24" class="text-primary-500" />
                 </div>
-                <span class="text-sm mt-1">接收</span>
+                <span class="text-sm mt-1">{{ i18n.text.Receive }}</span>
             </div>
             <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/transfer')">
                 <div class="bg-purple-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:external-link" size="24" class="text-purple-500" />
                 </div>
-                <span class="text-sm mt-1">发送</span>
+                <span class="text-sm mt-1">{{ i18n.text.Send }}</span>
             </div>
             <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/actions')">
                 <div class="bg-yellow-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
                     <UIcon name="ci:notebook" size="24" class="text-orange-500" />
                 </div>
-                <span class="text-sm mt-1">活动</span>
+                <span class="text-sm mt-1">{{ i18n.text.Activities }}</span>
             </div>
         </div>
 
@@ -84,6 +84,7 @@
 import { getBalance, getPopularERC20Balance, type ERC20Balance } from '~/utils/balance'
 import { useUserStore } from '../stores/user'
 import { useChainStore } from '../stores/chain'
+import { useI18n } from '../stores/i18n'
 import { displayBalance } from '~/utils/display'
 
 const userStore = useUserStore()
@@ -91,6 +92,7 @@ const user = computed(() => userStore.user)
 const loading = ref(false)
 const toast = useToast()
 const useChain = useChainStore()
+const i18n = useI18n()
 const balances = ref<ERC20Balance[]>([])
 
 const data = reactive({
@@ -110,8 +112,8 @@ const handleGetData = async () => {
     } catch (error) {
         console.error(error)
         toast.add({
-            title: '获取数据失败',
-            description: '请稍后再试',
+            title: i18n.text['Get Data Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     } finally {

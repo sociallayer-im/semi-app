@@ -1,12 +1,12 @@
 <template>
     <UDropdownMenu :items="[
         {
-            label: '导出钱包',
+            label: i18n.text['Export Wallet'],
             icon: 'i-ci-download',
             onSelect: handleExportKeyStore
         },
         {
-            label: '退出登录',
+            label: i18n.text['Logout'],
             icon: 'i-ci-log-out',
             onSelect: handleLogout
         }
@@ -18,10 +18,12 @@
 <script setup lang="ts">
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
+import { useI18n } from '../stores/i18n'
 
 const userStore = useUserStore()
 const toast = useToast()
 const router = useRouter()
+const i18n = useI18n()
 
 const handleExportKeyStore = () => {
     router.push('/export')
@@ -31,15 +33,15 @@ const handleLogout = async () => {
     try {
         await userStore.signout()
         toast.add({
-            title: '退出成功',
-            description: '您已成功退出登录',
+            title: i18n.text['Logout Success'],
+            description: i18n.text['You have successfully logged out'],
             color: 'success'
         })
     } catch (error) {
         console.error(error)
         toast.add({
-            title: '退出失败',
-            description: '请稍后再试',
+            title: i18n.text['Logout Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     }

@@ -1,5 +1,5 @@
 <template>
-    <UModal v-model:open="open" title="扫描二维码" :close="{
+    <UModal v-model:open="open" :title="i18n.text['Scan QR Code']" :close="{
         color: 'primary',
         variant: 'outline',
         class: 'rounded-full'
@@ -27,6 +27,9 @@ const open = ref(false)
 const result = ref('')
 const error = ref('')
 
+// 获取i18n store
+const i18n = useI18n()
+
 function paintBoundingBox(detectedCodes, ctx) {
     for (const detectedCode of detectedCodes) {
         const {
@@ -43,19 +46,19 @@ function onError(err) {
     error.value = `[${err.name}]: `
 
     if (err.name === 'NotAllowedError') {
-        error.value += 'you need to grant camera access permission'
+        error.value += i18n.text['You need to grant camera access permission']
     } else if (err.name === 'NotFoundError') {
-        error.value += 'no camera on this device'
+        error.value += i18n.text['No camera on this device']
     } else if (err.name === 'NotSupportedError') {
-        error.value += 'secure context required (HTTPS, localhost)'
+        error.value += i18n.text['Secure context required (HTTPS, localhost)']
     } else if (err.name === 'NotReadableError') {
-        error.value += 'is the camera already in use?'
+        error.value += i18n.text['Is the camera already in use?']
     } else if (err.name === 'OverconstrainedError') {
-        error.value += 'installed cameras are not suitable'
+        error.value += i18n.text['Installed cameras are not suitable']
     } else if (err.name === 'StreamApiNotSupportedError') {
-        error.value += 'Stream API is not supported in this browser'
+        error.value += i18n.text['Stream API is not supported in this browser']
     } else if (err.name === 'InsecureContextError') {
-        error.value += 'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.'
+        error.value += i18n.text['Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.']
     } else {
         error.value += err.message
     }
