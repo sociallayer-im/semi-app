@@ -2,12 +2,12 @@
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg  p-4">
         <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
             @click="router.push('/login')">
-            返回
+            {{ i18n.text.Back }}
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold">验证手机号</h1>
-            <div>请输入<span class="text-primary font-semibold mx-1">{{ phone.slice(0, 3) }}...{{ phone.slice(-4)
-                    }}</span>收到的6位验证码</div>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Verify Phone Number'] }}</h1>
+            <div>{{ i18n.text['Please enter the 6-digit verification code received by'] }}<span class="text-primary font-semibold mx-1">{{ phone.slice(0, 3) }}...{{ phone.slice(-4)
+                    }}</span></div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
                     <UPinInput variant="subtle" type="number" v-model="formState.pin" :length="6" size="xl" class="w-full"
@@ -16,12 +16,12 @@
                 <div class="flex justify-between items-center mt-2">
                     <UButton type="button" color="neutral" variant="ghost" :disabled="countdown > 0 || loading"
                         @click="resendCode">
-                        {{ countdown > 0 ? `重新发送(${countdown})` : '重新发送验证码' }}
+                        {{ countdown > 0 ? i18n.text['Resend ({countdown})'].replace('{countdown}', countdown.toString()) : i18n.text['Resend Code'] }}
                     </UButton>
                 </div>
                 <UButton type="submit" color="primary" class="w-full mt-4 flex justify-center items-center" size="xl"
                     :loading="loading" :disabled="loading">
-                    验证
+                    {{ i18n.text.Verify }}
                 </UButton>
             </UForm>
         </div>
@@ -44,6 +44,7 @@ const loading = ref(false)
 const countdown = ref(60)
 const toast = useToast()
 const userStore = useUserStore()
+const i18n = useI18n()
 
 const startCountdown = () => {
     countdown.value = 60
@@ -62,8 +63,8 @@ const resendCode = async () => {
         const response = await sendSMS(phone.value)
         if (response.result === 'ok') {
             toast.add({
-                title: '发送成功',
-                description: '验证码已发送到您的手机',
+                title: i18n.text['Code sent successfully'],
+                description: i18n.text['Verification code has been sent to your phone'],
                 color: 'success'
             })
             startCountdown()
@@ -71,8 +72,8 @@ const resendCode = async () => {
     } catch (error) {
         console.error('发送验证码失败:', error)
         toast.add({
-            title: '发送验证码失败',
-            description: '请稍后重试',
+            title: i18n.text['Failed to send verification code'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     } finally {
@@ -90,8 +91,8 @@ const formState = reactive({
 
 const validatePin = (value: string[]) => {
     const pin = value.join('')
-    if (!pin) return '请输入验证码'
-    if (!/^\d{6}$/.test(pin)) return '请输入6位数字验证码'
+    if (!pin) return i18n.text['Please enter verification code']
+    if (!/^\d{6}$/.test(pin)) return i18n.text['Please enter 6-digit verification code']
     return true
 }
 
@@ -105,7 +106,7 @@ const onSubmit = async () => {
                 const user = await getMe()
                 userStore.setUser(user)
                 toast.add({
-                    title: '验证成功',
+                    title: i18n.text['Verification successful'],
                     description: '',
                     color: 'success'
                 })
@@ -114,7 +115,7 @@ const onSubmit = async () => {
             }
         } else {
             toast.add({
-                title: '请输入正确的验证码',
+                title: i18n.text['Please enter 6-digit verification code'],
                 description: validation,
                 color: 'error'
             })
@@ -122,8 +123,8 @@ const onSubmit = async () => {
     } catch (error) {
         console.error('验证失败:', error)
         toast.add({
-            title: '验证失败',
-            description: '请检查验证码是否正确',
+            title: i18n.text['Verification failed'],
+            description: i18n.text['Please check if the verification code is correct'],
             color: 'error'
         })
     } finally {

@@ -6,11 +6,11 @@
             class="self-start mb-4"
             @click="handleLogout"
         >
-            退出登录
+            {{ i18n.text['Logout'] }}
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold">设置支付码</h1>
-            <div>{{ step === 1 ? '请输入6位数字支付码' : '请再次输入支付码' }}</div>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Set Payment Code'] }}</h1>
+            <div>{{ step === 1 ? i18n.text['Please enter 6-digit payment code'] : i18n.text['Please enter payment code again'] }}</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
                     <UPinInput
@@ -35,7 +35,7 @@
                         :disabled="loading"
                         @click="handleReset"
                     >
-                        重置
+                        {{ i18n.text['Reset'] }}
                     </UButton>
                     <UButton
                         type="submit"
@@ -45,7 +45,7 @@
                         :loading="loading"
                         :disabled="loading || !isPinComplete"
                     >
-                        {{ step === 1 ? '下一步' : '确认' }}
+                        {{ step === 1 ? i18n.text['Next'] : i18n.text['Confirm'] }}
                     </UButton>
                 </div>
             </UForm>
@@ -63,6 +63,7 @@ import { setEncryptedKeys } from '~/utils/semi_api'
 const router = useRouter()
 const userStore = useUserStore()
 const useChain = useChainStore()
+const i18n = useI18n()
 const loading = ref(false)
 const toast = useToast()
 const step = ref(1)
@@ -85,7 +86,7 @@ const isPinComplete = computed(() => {
 const createManagerWallet = async (pin: string) => {
     try {
         if (!userStore.user?.id) {
-            throw new Error('用户未登录')
+            throw new Error(i18n.text['User not logged in'])
         }
 
         // 第一步：生成助记词和钱包地址
@@ -112,8 +113,8 @@ const createManagerWallet = async (pin: string) => {
         
         if (response.result === 'ok') {
             toast.add({
-                title: '设置成功',
-                description: '支付码已设置完成',
+                title: i18n.text['Setup Success'],
+                description: i18n.text['Payment code has been set up successfully'],
                 color: 'success'
             })
 
@@ -121,7 +122,7 @@ const createManagerWallet = async (pin: string) => {
             await userStore.getUser(true)
             router.push('/')
         } else {
-            throw new Error('设置失败')
+            throw new Error(i18n.text['Setup Failed'])
         }
     } catch (error) {
         console.error('创建钱包失败:', error)
@@ -142,7 +143,7 @@ const onSubmit = async () => {
         const secondPin = formState.pin.join('')
         if (firstPin.value !== secondPin) {
             toast.add({
-                title: '两次输入的支付码不一致',
+                title: i18n.text['Payment codes do not match'],
                 color: 'error'
             })
             return
@@ -152,8 +153,8 @@ const onSubmit = async () => {
     } catch (error) {
         console.error('设置支付码失败:', error)
         toast.add({
-            title: '设置失败',
-            description: '请稍后重试',
+            title: i18n.text['Setup Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     } finally {
@@ -171,15 +172,15 @@ const handleLogout = async () => {
     try {
         await userStore.signout()
         toast.add({
-            title: '登出成功',
+            title: i18n.text['Logout Success'],
             color: 'success'
         })
         router.push('/')
     } catch (error) {
         console.error('登出失败:', error)
         toast.add({
-            title: '登出失败',
-            description: '请稍后重试',
+            title: i18n.text['Logout Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     }

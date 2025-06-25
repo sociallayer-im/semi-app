@@ -1,11 +1,11 @@
 <template>
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4">
         <UButton con="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4" @click="handleBack">
-            返回
+            {{ i18n.text.Back }}
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold">登录密码</h1>
-            <div>{{ '请输入6位数字密码, 如果这是你第一次登录，我们自动为你创建用户。' }}</div>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Login Password'] }}</h1>
+            <div>{{ i18n.text['Please enter 6-digit password. If this is your first login, we will automatically create a user for you.'] }}</div>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="pin">
                     <UPinInput variant="subtle" type="number" v-model="formState.pin" :length="6" size="xl"
@@ -14,7 +14,7 @@
                 <div class="flex gap-4 mt-4">
                     <UButton type="submit" color="primary" :class="['flex-1 flex justify-center items-center', 'w-full']"
                         size="xl" :loading="loading" :disabled="loading || !isPinComplete">
-                        登录
+                        {{ i18n.text.Login }}
                     </UButton>
                 </div>
             </UForm>
@@ -27,12 +27,13 @@ import { useUserStore } from '~/stores/user'
 import { useChainStore } from '~/stores/chain'
 import { generateMnemonicPhrase, getAddressFromMnemonic, encryptMnemonicToKeystore } from '~/utils/encryption'
 import { predictSafeAccountAddress } from '~/utils/SafeSmartAccount'
-import { setEncryptedKeys } from '~/utils/semi_api'
+import { setEncryptedKeys, signinWithPassword, getMe } from '~/utils/semi_api'
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 const useChain = useChainStore()
+const i18n = useI18n()
 const loading = ref(false)
 const toast = useToast()
 
@@ -76,8 +77,8 @@ const createManagerWallet = async (pin: string, userId: string) => {
 
         if (response.result === 'ok') {
             toast.add({
-                title: '设置成功',
-                description: '支付码已设置完成',
+                title: i18n.text['Setup Success'],
+                description: i18n.text['Payment code has been set up successfully'],
                 color: 'success'
             })
 
@@ -104,16 +105,16 @@ const onSubmit = async () => {
         }
 
         toast.add({
-            title: '登录成功',
-            description: '正在跳转到首页',
+            title: i18n.text['Login Success'],
+            description: i18n.text['Redirecting to homepage'],
             color: 'success'
         })
         await router.push('/')
     } catch (error) {
         console.error('登录失败:', error)
         toast.add({
-            title: '登录失败',
-            description: '请稍后重试',
+            title: i18n.text['Login Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     } finally {

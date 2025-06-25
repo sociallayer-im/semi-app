@@ -2,18 +2,18 @@
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4">
         <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
             @click="router.push('/')">
-            返回
+            {{ i18n.text['Back'] }}
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 pb-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold">发送代币</h1>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Send Tokens'] }}</h1>
 
             <!-- 步骤1：输入转账信息 -->
             <div v-if="step === 1" class="w-full">
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
-                    <UFormField name="to" label="接收人(支持地址或手机号)">
+                    <UFormField name="to" :label="i18n.text['Recipient (supports address or phone number)']">
                         <div class="flex items-start flex-row gap-2">
                             <UTextarea size="xl" class="w-full" variant="subtle" v-model="formState.to"
-                                placeholder="请输入接收地址/手机号" :ui="{ base: 'w-full' }" :disabled="initializing" />
+                                :placeholder="i18n.text['Please enter recipient address/phone number']" :ui="{ base: 'w-full' }" :disabled="initializing" />
                             <div class="flex flex-col gap-2">
                                 <UButton icon="ci:close-md" color="neutral" variant="subtle" size="xl"
                                     class="text-2xl cursor-pointer" @click="formState.to = ''">
@@ -23,16 +23,16 @@
                         </div>
                     </UFormField>
 
-                    <UFormField name="amount" label="发送数量" class="mt-4">
+                    <UFormField name="amount" :label="i18n.text['Send Amount']" class="mt-4">
                         <div class="flex items-center gap-2">
                             <TokenSwitch :token-list="tokenList" v-model="formState.token" v-if="formState.token" />
                             <UInput variant="subtle" size="xl" class="w-full flex-1" v-model="formState.amount"
-                                placeholder="请输入发送数量" :ui="{ base: 'w-full' }" :disabled="initializing || !balance" />
+                                :placeholder="i18n.text['Please enter send amount']" :ui="{ base: 'w-full' }" :disabled="initializing || !balance" />
                         </div>
                     </UFormField>
 
                     <div class="mt-4">
-                        <div class="text-gray-400 text-sm">余额</div>
+                        <div class="text-gray-400 text-sm">{{ i18n.text['Balance'] }}</div>
                         <div class="flex items-center gap-2">
                             <span class="text-3xl font-bold" v-if="initializing">-- {{ formState.token?.symbol }}</span>
                             <span class="text-3xl font-bold" v-else>
@@ -45,7 +45,7 @@
                     <UButton type="submit" color="primary" class="w-full mt-4 flex justify-center items-center"
                         size="xl" :loading="initializing || loading"
                         :disabled="initializing || loading || !isFormValid || !balance">
-                        下一步
+                        {{ i18n.text['Next'] }}
                     </UButton>
                 </UForm>
             </div>
@@ -53,7 +53,7 @@
             <!-- 步骤2：输入验证码 -->
             <div v-if="step === 2" class="w-full">
                 <div class="text-center mb-4">
-                    <div class="text-gray-400 text-sm mb-2">请输入6位密码</div>
+                    <div class="text-gray-400 text-sm mb-2">{{ i18n.text['Please enter 6-digit password'] }}</div>
                 </div>
 
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
@@ -64,7 +64,7 @@
 
                     <div class="text-gray-400 text-sm mt-3" v-if="formState.gasEstimate !== '0'">
                         <span class="flex items-center gap-1">
-                            预估手续费
+                            {{ i18n.text['Estimated Fee'] }}
                             <FeeTipPopup />
                         </span>
                         <span
@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="text-gray-400 text-sm mt-2">
-                        剩余免手续费交易次数：
+                        {{ i18n.text['Remaining free transaction count'] }}
                         <span class="font-bold text-base text-foreground">
                             {{ formState.remainingFreeTransactions }}
                         </span>
@@ -83,11 +83,11 @@
                     <div class="flex gap-4 mt-4">
                         <UButton type="button" color="neutral" class="flex-1 flex justify-center items-center" size="xl"
                             :disabled="loading" @click="handleReset">
-                            上一步
+                            {{ i18n.text['Previous'] }}
                         </UButton>
                         <UButton type="submit" color="primary" class="flex-1 flex justify-center items-center" size="xl"
                             :loading="loading" :disabled="loading || !isCodeComplete">
-                            确认
+                            {{ i18n.text['Confirm'] }}
                         </UButton>
                     </div>
                 </UForm>
@@ -102,9 +102,9 @@ import { useChainStore, chainMap } from '@/stores/chain'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getBalance, getErc20Balance } from '~/utils/balance'
-import { estimateGas, predictSafeAccountAddress, transfer, transferErc20 } from '~/utils/SafeSmartAccount'
+import { predictSafeAccountAddress, transfer, transferErc20 } from '~/utils/SafeSmartAccount'
 import { displayBalance } from '~/utils/display'
-import { isAddress, zeroAddress, formatUnits } from 'viem'
+import { isAddress, zeroAddress } from 'viem'
 import { keystoreToPrivateKey } from '~/utils/encryption'
 import { getUserByHandleOrPhone, getRemainingGasCredits, uploadTransaction } from '~/utils/semi_api'
 import { isGasSponsorshipChain } from '~/utils/gas_sponsorship'
@@ -141,6 +141,7 @@ const router = useRouter()
 const useChain = useChainStore()
 const user = useUserStore()
 const toast = useToast()
+const i18n = useI18n()
 
 // 响应式状态
 const initializing = ref(false)
@@ -185,19 +186,19 @@ const isCodeComplete = computed(() => {
 
 // 工具函数
 const getErrorMessage = (error: unknown): string => {
-    if (!(error instanceof Error)) return "请稍后再试"
-    if (!error.message) return "请稍后再试"
+    if (!(error instanceof Error)) return i18n.text['Please try again later']
+    if (!error.message) return i18n.text['Please try again later']
     
     return error.message.includes(
         "Smart Account does not have sufficient funds to execute the User Operation"
-    ) ? "账户余额不足以支付手续费" : error.message
+    ) ? i18n.text['Insufficient balance to pay gas fees'] : error.message
 }
 
 const handleError = (error: unknown, title: string, description?: string) => {
     console.error(error)
     toast.add({
         title,
-        description: description || (error instanceof Error ? error.message : '请稍后再试'),
+        description: description || (error instanceof Error ? error.message : i18n.text['Please try again later']),
         color: 'error'
     })
 }
@@ -227,7 +228,7 @@ const fetchTokenBalance = async () => {
                 useChain.chain
             )
     } catch (error) {
-        handleError(error, '获取余额失败')
+        handleError(error, i18n.text['Get balance failed'])
     } finally {
         initializing.value = false
     }
@@ -238,7 +239,7 @@ const validateBalance = (): boolean => {
     
     const amount = Number(formState.amount) * 10 ** (formState.token.decimals as number)
     if (amount > Number(balance.value)) {
-        handleError(new Error('余额不足'), '余额不足')
+        handleError(new Error(i18n.text['Insufficient balance']), i18n.text['Insufficient balance'])
         return false
     }
     return true
@@ -249,7 +250,7 @@ const resolveRecipient = async (): Promise<boolean> => {
         if (isPhoneNumber(formState.to)) {
             const recipient = await getUserByHandleOrPhone(formState.to)
             if (!recipient?.evm_chain_address) {
-                handleError(new Error('无效手机号'), '无效手机号')
+                handleError(new Error(i18n.text['Invalid phone number']), i18n.text['Invalid phone number'])
                 return false
             }
             formState.recipient = recipient.evm_chain_address as `0x${string}`
@@ -258,7 +259,7 @@ const resolveRecipient = async (): Promise<boolean> => {
         }
         return true
     } catch (error) {
-        handleError(error, '获取接收地址失败', '请检查手机号是否正确')
+        handleError(error, i18n.text['Get recipient address failed'], i18n.text['Please check if the phone number is correct'])
         return false
     }
 }
@@ -273,7 +274,7 @@ const fetchGasCredits = async (): Promise<boolean> => {
         }
         return true
     } catch (error) {
-        handleError(error, '获取免手续费交易次数失败', '请稍后再试')
+        handleError(error, i18n.text['Get free transaction count failed'], i18n.text['Please try again later'])
         return false
     }
 }
@@ -319,13 +320,13 @@ const handleTokenTransfer = async () => {
         })
 
         toast.add({
-            title: '转账成功',
-            description: '转账已提交',
+            title: i18n.text['Transfer Success'],
+            description: i18n.text['Transfer has been submitted'],
             color: 'success'
         })
         router.push('/')
     } catch (error) {
-        handleError(error, '转账失败', getErrorMessage(error))
+        handleError(error, i18n.text['Transfer Failed'], getErrorMessage(error))
         resetForm()
     } finally {
         loading.value = false
@@ -341,7 +342,7 @@ const initFormFromQuery = async () => {
         if (numChainId in chainMap) {
             await useChain.switch(numChainId)
         } else {
-            handleError(new Error('无效链ID'), '无效链ID', 'URL中的链ID不正确')
+            handleError(new Error(i18n.text['Invalid chain ID']), i18n.text['Invalid chain ID'], i18n.text['Chain ID in URL is incorrect'])
         }
     }
 
@@ -350,7 +351,7 @@ const initFormFromQuery = async () => {
         const targetToken = tokenList.value.find((token) => token.address === token_address)
         formState.token = targetToken || nativeToken.value
         if (!targetToken) {
-            handleError(new Error('无效代币地址'), '无效代币地址', 'URL中的代币地址不正确或者不支持的代币')
+            handleError(new Error(i18n.text['Invalid token address']), i18n.text['Invalid token address'], i18n.text['Token address in URL is incorrect or unsupported token'])
         }
     } else {
         formState.token = nativeToken.value
@@ -361,8 +362,8 @@ const initFormFromQuery = async () => {
         formState.to = to
     } else if (to && typeof to === 'string') {
         toast.add({
-            title: '无效地址',
-            description: 'URL中的接收地址格式不正确',
+            title: i18n.text['Invalid address'],
+            description: i18n.text['Chain ID in URL is incorrect'],
             color: 'error'
         })
     }
@@ -373,7 +374,7 @@ const initFormFromQuery = async () => {
         if (!isNaN(numAmount) && numAmount > 0) {
             formState.amount = amount
         } else {
-            handleError(new Error('无效金额'), '无效金额', 'URL中的金额必须是大于0的数字')
+            handleError(new Error(i18n.text['Invalid amount']), i18n.text['Invalid amount'], i18n.text['Amount in URL must be a number greater than 0'])
         }
     }
 }
@@ -410,12 +411,12 @@ const handleQrCodeDetect = (values: string[]) => {
         if (isAddress(address)) {
             formState.to = address
             toast.add({
-                title: '扫码成功',
-                description: '已填入接收地址',
+                title: i18n.text['Scan successful'],
+                description: i18n.text['Recipient address has been filled'],
                 color: 'success'
             })
         } else {
-            handleError(new Error('无效地址'), '无效地址', '扫描的二维码不是有效的以太坊地址')
+            handleError(new Error(i18n.text['Invalid address']), i18n.text['Invalid address'], i18n.text['Scanned QR code is not a valid Ethereum address'])
         }
     }
 }

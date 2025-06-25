@@ -2,21 +2,21 @@
     <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4">
         <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
             @click="handleLogout">
-            退出登录
+            {{ i18n.text['Logout'] }}
         </UButton>
         <div class="flex flex-col items-center justify-center h-full gap-4 pb-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold">设置您的用户名</h1>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Set Your Username'] }}</h1>
             <UForm :state="formState" @submit="onSubmit" class="w-full">
                 <UFormField name="handle">
-                    <UInput size="xl" class="w-full" v-model="formState.handle" placeholder="请输入用户名"
+                    <UInput size="xl" class="w-full" v-model="formState.handle" :placeholder="i18n.text['Please enter username']"
                         :ui="{ base: 'w-full' }" :disabled="loading" variant="subtle" />
                 </UFormField>
-                <div class="text-sm text-gray-500 mt-2">长度在6-30个字符之间；</div>
-                <div class="text-sm text-gray-500">只允许使用字母、数字、下划线和连字符；</div>
-                <div class="text-sm text-gray-500">不能全部为数字。</div>
+                <div class="text-sm text-gray-500 mt-2">{{ i18n.text['Length between 6-30 characters'] }}</div>
+                <div class="text-sm text-gray-500">{{ i18n.text['Only letters, numbers, underscores and hyphens are allowed'] }}</div>
+                <div class="text-sm text-gray-500">{{ i18n.text['Cannot be all numbers'] }}</div>
                 <UButton type="submit" color="primary" class="w-full mt-4 flex justify-center items-center" size="xl"
                     :loading="loading" :disabled="loading || !formState.handle">
-                    确认
+                    {{ i18n.text['Confirm'] }}
                 </UButton>
             </UForm>
         </div>
@@ -32,6 +32,7 @@ const router = useRouter()
 const loading = ref(false)
 const toast = useToast()
 const userStore = useUserStore()
+const i18n = useI18n()
 
 const formState = reactive({
     handle: ''
@@ -41,27 +42,27 @@ const handleLogout = async () => {
     try {
         await userStore.signout()
         toast.add({
-            title: '退出成功',
-            description: '您已成功退出登录',
+            title: i18n.text['Logout Success'],
+            description: i18n.text['You have successfully logged out'],
             color: 'success'
         })
         router.push('/')
     } catch (error) {
         console.error(error)
         toast.add({
-            title: '退出失败',
-            description: '请稍后再试',
+            title: i18n.text['Logout Failed'],
+            description: i18n.text['Please try again later'],
             color: 'error'
         })
     }
 }
 
 const validateHandle = (value: string) => {
-    if (!value) return '请输入用户名'
-    if (value.length < 6) return '用户名至少需要6个字符'
-    if (value.length > 30) return '用户名不能超过30个字符'
-    if (!/^[a-zA-Z0-9_-]+$/.test(value)) return '用户名只能包含字母、数字、下划线和连字符'
-    if (/^\d+$/.test(value)) return '用户名不能全部为数字'
+    if (!value) return i18n.text['Please enter username first']
+    if (value.length < 6) return i18n.text['Username must be at least 6 characters']
+    if (value.length > 30) return i18n.text['Username cannot exceed 30 characters']
+    if (!/^[a-zA-Z0-9_-]+$/.test(value)) return i18n.text['Username can only contain letters, numbers, underscores and hyphens']
+    if (/^\d+$/.test(value)) return i18n.text['Username cannot be all numbers']
     return true
 }
 
@@ -74,8 +75,8 @@ const onSubmit = async () => {
             try {
                 const user = await getUserByHandle(formState.handle)
                 toast.add({
-                    title: '用户名已存在',
-                    description: '请输入其他用户名',
+                    title: i18n.text['Username already exists'],
+                    description: i18n.text['Please enter another username'],
                     color: 'error'
                 })
                 return
@@ -91,7 +92,7 @@ const onSubmit = async () => {
             await router.push('/')
         } else {
             toast.add({
-                title: '请输入正确的用户名',
+                title: i18n.text['Please enter correct username'],
                 description: validation,
                 color: 'error'
             })
