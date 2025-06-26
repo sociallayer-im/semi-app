@@ -32,11 +32,12 @@
                         </div>
                     </UFormField>
 
-                    <UFormField name="maxSupply" label="Max Supply" class="mt-4">
+                    <UFormField name="maxSupply" :label="i18n.text['Max Supply']" class="mt-4">
                         <UInput variant="subtle" size="md" class="w-full" v-model="formState.maxSupply"
-                            placeholder="Please enter max supply" :ui="{ base: 'w-full' }" :disabled="initializing" />
+                            :placeholder="i18n.text['Please enter max supply']" :ui="{ base: 'w-full' }"
+                            :disabled="initializing" />
                         <div class="text-sm text-gray-500 mt-2">
-                            The maximum number of tokens that can be minted.
+                            {{ i18n.text['The maximum number of tokens that can be minted'] }}
                         </div>
                     </UFormField>
 

@@ -168,5 +168,8 @@
     "Please check if the verification code is correct": "请检查验证码是否正确",
     "Deploy Factory": "部署Factory",
     "Factory contract has been successfully deployed to blockchain": "Factory合约已成功部署到区块链",
-    "Upload Failed": "上传失败"
+    "Upload Failed": "上传失败",
+    "Max Supply": "最大供应量",
+    "The maximum number of tokens that can be minted": "最大可铸造代币数量",
+    "Please enter max supply": "请输入最大供应量"
 }

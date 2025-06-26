@@ -168,5 +168,8 @@
     "Please check if the verification code is correct": "Please check if the verification code is correct",
     "Deploy Factory": "Deploy Factory",
     "Factory contract has been successfully deployed to blockchain": "Factory contract has been successfully deployed to blockchain",
-    "Upload Failed": "Upload Failed"
+    "Upload Failed": "Upload Failed",
+    "Max Supply": "Max Supply",
+    "The maximum number of tokens that can be minted":"The maximum number of tokens that can be minted",
+    "Please enter max supply":"Please enter max supply"
 }
