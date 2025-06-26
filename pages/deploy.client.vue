@@ -1,44 +1,56 @@
 <template>
-    <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4">
+    <div class="flex flex-col container-size rounded-xl bg-[var(--ui-bg)] shadow-lg p-4 "
+        :style="{ maxHeight: `90svh` }">
         <UButton icon="i-heroicons-arrow-left" color="neutral" variant="ghost" class="self-start mb-4"
             @click="router.push('/')">
             {{ i18n.text['Back'] }}
         </UButton>
-        <div class="flex flex-col items-center justify-center h-full gap-4 pb-8 w-[80%] mx-auto">
-            <h1 class="text-2xl font-bold" v-if="step != 3">{{ i18n.text['Deploy Token'] }}</h1>
+        <div class="flex-1 pb-4 w-[90%] mx-auto overflow-y-auto">
+            <div class="text-2xl font-bold text-center mb-4" v-if="step != 3">{{ i18n.text['Deploy Token'] }}</div>
 
             <!-- 步骤1：输入代币信息 -->
             <div v-if="step === 1" class="w-full">
                 <UForm :state="formState" @submit="onSubmit" class="w-full">
                     <UFormField name="name" :label="i18n.text['Token Name']">
-                        <UInput variant="subtle" size="xl" class="w-full" v-model="formState.name" :placeholder="i18n.text['Please enter token name']"
-                            :ui="{ base: 'w-full' }" :disabled="initializing" />
+                        <UInput variant="subtle" size="md" class="w-full" v-model="formState.name"
+                            :placeholder="i18n.text['Please enter token name']" :ui="{ base: 'w-full' }"
+                            :disabled="initializing" />
                     </UFormField>
 
                     <UFormField name="symbol" :label="i18n.text['Token Symbol']" class="mt-4">
-                        <UInput variant="subtle" size="xl" class="w-full" v-model="formState.symbol"
-                            :placeholder="i18n.text['Please enter token symbol']" :ui="{ base: 'w-full' }" :disabled="initializing" />
+                        <UInput variant="subtle" size="md" class="w-full" v-model="formState.symbol"
+                            :placeholder="i18n.text['Please enter token symbol']" :ui="{ base: 'w-full' }"
+                            :disabled="initializing" />
                     </UFormField>
 
-                    <!-- 可选预铸造选项 -->
-                    <div class="mt-3">
-                        <div class="flex items-center gap-2 mb-4 mt-2">
-                            <UCheckbox v-model="formState.enablePreMint" />
-                            <span class="text-sm">{{ i18n.text['Enable Pre-mint'] }}</span>
+                    <UFormField name="minter" :label="i18n.text['Minter Address']" class="mt-4">
+                        <UInput variant="subtle" size="md" class="w-full" v-model="formState.minter"
+                            :placeholder="i18n.text['Please enter minter address']" :ui="{ base: 'w-full' }"
+                            :disabled="initializing" />
+                        <div class="text-sm text-gray-500 mt-2">
+                            {{ i18n.text['Minter has the right to mint tokens'] }}
                         </div>
+                    </UFormField>
 
-                        <div v-if="formState.enablePreMint" class="space-y-4 mb-4">
-                            <UFormField name="minter" :label="i18n.text['Recipient Address']">
-                                <UInput variant="subtle" size="xl" class="w-full" v-model="formState.minter"
-                                    :placeholder="i18n.text['Please enter recipient address']" :ui="{ base: 'w-full' }" :disabled="initializing" />
-                            </UFormField>
-
-                            <UFormField name="initMint" :label="i18n.text['Initial Mint Amount']" class="mt-4">
-                                <UInput variant="subtle" size="xl" class="w-full" v-model="formState.initMint"
-                                    :placeholder="i18n.text['Please enter initial mint amount']" :ui="{ base: 'w-full' }" :disabled="initializing" />
-                            </UFormField>
+                    <UFormField name="maxSupply" label="Max Supply" class="mt-4">
+                        <UInput variant="subtle" size="md" class="w-full" v-model="formState.maxSupply"
+                            placeholder="Please enter max supply" :ui="{ base: 'w-full' }" :disabled="initializing" />
+                        <div class="text-sm text-gray-500 mt-2">
+                            The maximum number of tokens that can be minted.
                         </div>
-                    </div>
+                    </UFormField>
+
+                    <UFormField name="initMint" :label="i18n.text['Initial Mint Amount']" class="mt-4">
+                        <UInput variant="subtle" size="md" class="w-full" v-model="formState.initMint"
+                            :placeholder="i18n.text['Please enter initial mint amount']" :ui="{ base: 'w-full' }"
+                            :disabled="initializing" />
+                        <div class="text-sm text-gray-500 mt-2">{{ i18n.text['Tokens will be sent to the minter'] }}
+                        </div>
+                    </UFormField>
+
+                    <UFormField name="icon" :label="i18n.text['Icon']" class="mt-4">
+                        <UploadFile v-model="formState.icon" />
+                    </UFormField>
 
                     <UButton type="submit" color="primary" class="w-full mt-6 flex justify-center items-center"
                         size="xl" :loading="initializing || loading"
@@ -78,41 +90,49 @@
                 <div class="text-center mb-6">
                     <UIcon name="ci:circle-check-outline" class="text-green-500 text-8xl" />
                     <h2 class="text-xl font-semibold mb-2">{{ i18n.text['Deploy Success'] }}</h2>
-                    <p class="text-gray-500 text-sm">{{ i18n.text['Token contract has been successfully deployed to blockchain'] }}</p>
+                    <p class="text-gray-500 text-sm">
+                        {{ i18n.text['Token contract has been successfully deployed to blockchain'] }}
+                    </p>
                 </div>
 
                 <div class="space-y-4 mb-6">
                     <UFormField name="contractAddress" :label="i18n.text['Contract Address']">
                         <div class="flex flex-row gap-2 items-start">
                             <UTextarea variant="subtle" size="xl" class="w-full" v-model="newContractAddress"
-                                :placeholder="i18n.text['Contract Address']" :ui="{ base: 'w-full' }" :disabled="true" readonly />
+                                :placeholder="i18n.text['Contract Address']" :ui="{ base: 'w-full' }" :disabled="true"
+                                readonly />
                             <div class="flex flex-col gap-2 items-start">
                                 <UButton type="button" variant="outline" color="neutral" size="xl"
-                                @click="handleCopy(newContractAddress)">
-                                <UIcon name="ci:copy" size="22" class="cursor-pointer hover:text-primary-500 text-sm" />
-                            </UButton>
-                            <UButton type="button" variant="outline" color="neutral" size="xl"
-                                @click="gotoExplorer(newContractAddress, 'address')">
-                                <UIcon name="ci:globe" size="22" class="cursor-pointer hover:text-primary-500 text-sm" />
-                            </UButton>
+                                    @click="handleCopy(newContractAddress)">
+                                    <UIcon name="ci:copy" size="22"
+                                        class="cursor-pointer hover:text-primary-500 text-sm" />
+                                </UButton>
+                                <UButton type="button" variant="outline" color="neutral" size="xl"
+                                    @click="gotoExplorer(newContractAddress, 'address')">
+                                    <UIcon name="ci:globe" size="22"
+                                        class="cursor-pointer hover:text-primary-500 text-sm" />
+                                </UButton>
                             </div>
                         </div>
                     </UFormField>
 
                     <UFormField name="txHash" :label="i18n.text['Transaction Hash']">
                         <div class="flex flex-row gap-2 items-start">
-                            <UTextarea variant="subtle" size="xl" class="w-full" v-model="txHash" :placeholder="i18n.text['Transaction Hash']"
-                                :ui="{ base: 'w-full' }" :disabled="true" readonly />
+                            <UTextarea variant="subtle" size="xl" class="w-full" v-model="txHash"
+                                :placeholder="i18n.text['Transaction Hash']" :ui="{ base: 'w-full' }" :disabled="true"
+                                readonly />
                             <div class="flex flex-col gap-2 items-start">
                                 <UButton type="button" variant="outline" color="neutral" size="xl"
-                                @click="handleCopy(txHash)">
-                                <UIcon name="ci:copy" size="22" class="cursor-pointer hover:text-primary-500 text-sm" />
-                            </UButton>
+                                    @click="handleCopy(txHash)">
+                                    <UIcon name="ci:copy" size="22"
+                                        class="cursor-pointer hover:text-primary-500 text-sm" />
+                                </UButton>
 
-                            <UButton type="button" variant="outline" color="neutral" size="xl"
-                                @click="gotoExplorer(txHash, 'tx')">
-                                <UIcon name="ci:globe" size="22" class="cursor-pointer hover:text-primary-500 text-sm" />
-                            </UButton>
+                                <UButton type="button" variant="outline" color="neutral" size="xl"
+                                    @click="gotoExplorer(txHash, 'tx')">
+                                    <UIcon name="ci:globe" size="22"
+                                        class="cursor-pointer hover:text-primary-500 text-sm" />
+                                </UButton>
                             </div>
                         </div>
                     </UFormField>
@@ -131,20 +151,22 @@
 import { useChainStore } from '@/stores/chain'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { isAddress, encodeDeployData, zeroAddress, parseEther } from 'viem'
+import { isAddress, zeroAddress, parseEther } from 'viem'
 import { keystoreToPrivateKey } from '~/utils/encryption'
-import { abi, bytecode } from '~/utils/deploy/Minimal.json'
-import { deploy } from '~/utils/SafeSmartAccount/operation'
+import { deployToken } from '~/utils/SafeSmartAccount/operation'
+import { addTokenClass } from '~/utils/semi_api'
+import { TOKEN_FACTORY_CONTRACT } from '~/utils/config'
 
 // 类型定义
 interface FormState {
     name: string
     symbol: string
     owner: string
-    enablePreMint: boolean
     minter: string
     initMint: string
-    code: string[]
+    code: string[],
+    icon: string,
+    maxSupply: string
 }
 
 // 常量
@@ -165,28 +187,26 @@ const step = ref(1)
 const newContractAddress = ref('')
 const txHash = ref('')
 
-const formState = reactive<FormState>({
+const defaultFormState = {
     name: '',
     symbol: '',
     owner: import.meta.env.VITE_TOKEN_OWNER || useUser.user?.evm_chain_address || zeroAddress,
-    enablePreMint: false,
     minter: '',
     initMint: '',
-    code: [...DEFAULT_CODE]
-})
+    code: [...DEFAULT_CODE],
+    icon: 'https://ik.imagekit.io/soladata/kg8ddpwy_r5he8h1o9',
+    maxSupply: ''
+}
+
+const formState = reactive<FormState>(Object.assign({}, defaultFormState))
 
 // 计算属性
 const isFormValid = computed(() => {
-    console.log(formState.name, formState.symbol, formState.owner)
     if (!formState.name || !formState.symbol || !formState.owner) return false
     if (!isAddress(formState.owner)) return false
-
-    // 如果启用预铸造，验证相关字段
-    if (formState.enablePreMint) {
-        if (!formState.minter || !formState.initMint) return false
-        if (!isAddress(formState.minter)) return false
-        if (isNaN(Number(formState.initMint)) || Number(formState.initMint) <= 0) return false
-    }
+    if (!!formState.minter && !isAddress(formState.minter)) return false
+    if (!!formState.initMint && (isNaN(Number(formState.initMint)) || Number(formState.initMint) <= 0)) return false
+    if (!formState.maxSupply || isNaN(Number(formState.maxSupply)) || Number(formState.maxSupply) <= 0) return false
 
     return true
 })
@@ -220,7 +240,7 @@ const resetForm = () => {
 }
 
 // 业务逻辑函数
-const deployToken = async () => {
+const HandleDeployToken = async () => {
     loading.value = true
     try {
         const privateKey = await keystoreToPrivateKey(
@@ -228,32 +248,54 @@ const deployToken = async () => {
             formState.code.join('')
         )
 
-        // TODO: 实现部署函数
-        const deployData = encodeDeployData({
-            abi,
-            bytecode: bytecode.object as `0x${string}`,
-            args: [
-                formState.name,
-                formState.symbol,
-                formState.owner,
-                formState.minter || zeroAddress,
-                formState.initMint ? parseEther(formState.initMint).toString() : '0'
-            ],
-        })
-
-        const receipt = await deploy({
+        console.log('[deployToken]: ', useChain.chain)
+        const receipt = await deployToken({
             privateKey: privateKey as `0x${string}`,
             chain: useChain.chain,
-            callData: deployData,
+            name: formState.name,
+            symbol: formState.symbol,
+            owner: formState.owner as `0x${string}`,
+            minter: (formState.minter || zeroAddress) as `0x${string}`,
+            initMint: formState.initMint ? parseEther(formState.initMint).toString() : '0',
+            maxSupply: parseEther(formState.maxSupply).toString(),
         })
 
         console.log('[deploy contract receipt]: ', receipt)
-        const targetLog = receipt.logs.find((log: any) => log.address === CREATE_CALL_CONTRACT[useChain.chain.id])
+        txHash.value = receipt.receipt.transactionHash
+        const targetLog = receipt.logs.find((log: any) => log.address.toLowerCase() === TOKEN_FACTORY_CONTRACT[useChain.chain.id].toLowerCase())
         if (targetLog) {
             console.log('[targetLog]: ', targetLog)
-            newContractAddress.value = '0x' + targetLog.data.slice(26)
-            txHash.value = receipt.receipt.transactionHash
+            newContractAddress.value = '0x' + targetLog.topics[1].slice(26)
         }
+
+        // 上传代币信息
+        await addTokenClass({
+            token_type: 'ERC20',
+            chain_id: useChain.chain.id,
+            chain: useChain.chain.name.toLowerCase(),
+            address: newContractAddress.value,
+            name: formState.name,
+            symbol: formState.symbol,
+            image_url: formState.icon,
+            publisher_address: useUser.user?.evm_chain_address || zeroAddress,
+            position: 0,
+            description: '',
+            decimals: 18
+        })
+
+            // 解决BigInt序列化问题
+            ; (BigInt.prototype as any).toJSON = function () {
+                return this.toString()
+            }
+
+        // 上传部署记录
+        await uploadTransactionWithGasCredits({
+            tx_hash: receipt.receipt.transactionHash,
+            gas_used: receipt.actualGasCost.toString(),
+            status: receipt.success ? 'success' : 'failed',
+            chain: useChain.chain.name.toLowerCase(),
+            data: JSON.stringify(receipt) as any
+        })
 
         step.value = 3
         toast.add({
@@ -275,7 +317,7 @@ const onSubmit = async () => {
         return
     }
 
-    await deployToken()
+    await HandleDeployToken()
 }
 
 const handleReset = () => {
@@ -287,11 +329,12 @@ const handleConfirm = () => {
     Object.assign(formState, {
         name: '',
         symbol: '',
-        owner: import.meta.env.VITE_TOKEN_OWNER!,
-        enablePreMint: false,
+        owner: import.meta.env.VITE_TOKEN_OWNER || useUser.user?.evm_chain_address || zeroAddress,
         minter: '',
         initMint: '',
-        code: [...DEFAULT_CODE]
+        maxSupply: '',
+        code: [...DEFAULT_CODE],
+        icon: 'https://ik.imagekit.io/soladata/kg8ddpwy_r5he8h1o9'
     })
 
     // 重置其他状态
@@ -312,12 +355,4 @@ const handleCopy = (text: string) => {
 const gotoExplorer = (addressOrTxHash: string, type: 'address' | 'tx') => {
     window.open(useChain.chain.blockExplorers?.default.url + '/' + type + '/' + addressOrTxHash, '_blank')
 }
-
-// 监听器
-watch(() => formState.enablePreMint, (newValue) => {
-    if (!newValue) {
-        formState.minter = ''
-        formState.initMint = ''
-    }
-})
 </script>

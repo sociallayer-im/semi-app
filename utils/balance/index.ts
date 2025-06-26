@@ -1,6 +1,7 @@
 import { POPULAR_ERC20_TOKENS, type TokenMetadata } from './tokens'
 import {createPublicClient, http, type Address, type Chain, erc20Abi} from 'viem'
 import { RPC_URL } from '~/utils/config'
+import type { TokenClass } from '~/utils/semi_api'
 
 export async function getBalance(address: Address, chain: Chain) {
     const client = createPublicClient({
@@ -28,19 +29,17 @@ export async function getErc20Balance(address: Address, tokenAddress: Address, c
 
 
 export interface ERC20Balance {
-    token: TokenMetadata
+    token: TokenClass
     balance: bigint
 }
 
-export async function getPopularERC20Balance(address: Address, chain: Chain): Promise<ERC20Balance[]> {
+export async function getPopularERC20Balance(tokenClasses: TokenClass[], address: Address, chain: Chain): Promise<ERC20Balance[]> {
     const client = createPublicClient({
         chain,
         transport: http(RPC_URL[chain.id])
     })
 
-    const tokens = POPULAR_ERC20_TOKENS[chain.id]
-    
-    const balances = await Promise.all(tokens.map(async (token) => {
+    const balances = await Promise.all(tokenClasses.map(async (token) => {
         const balance = await client.readContract({
             address: token.address as `0x${string}`, 
             abi: erc20Abi,

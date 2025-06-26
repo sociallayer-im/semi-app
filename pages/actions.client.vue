@@ -122,9 +122,11 @@ onMounted(async () => {
     const updateActions = async (chain: Chain, safeAddress: string) => {
         loading.value = true
         try {
+            const { token_classes } = await getTokenClass()
+            const currentTokenClasses = token_classes.filter(token => token.chain_id === chain.id)
             const tasks = [
-                getSendActionsV2(safeAddress, chain),
-                getReceiveActions(safeAddress, chain)
+                getSendActionsV2(safeAddress, chain, currentTokenClasses),
+                getReceiveActions(safeAddress, chain, currentTokenClasses)
             ]
             const [sendActionsList, receiveActionsList] = await Promise.all(tasks)
             sendActions.value = sendActionsList

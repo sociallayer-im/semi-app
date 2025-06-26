@@ -274,7 +274,7 @@ export interface TransactionRecord {
     tx_hash: string;
     gas_used: string;
     status: string,
-    chain: number,
+    chain: string,
     data: string  // TransactionReceipt 的 JSON 字符串
 }
 
@@ -318,4 +318,72 @@ export async function getUserByHandleOrPhone(handleOrPhone: string): Promise<Use
     } catch (error) {
         return null
     }
+}
+
+export async function uploadFile(file: string, authToken: string): Promise<string> {
+    const formData = new FormData()
+    formData.append('auth_token', authToken)
+    formData.append('uploader', 'user')
+    formData.append('resource', Math.random().toString(36).slice(-8))
+    formData.append('data', file)
+
+    const response = await fetch('https://api.sola.day/service/upload_image', {
+        method: 'POST',
+        body: formData
+    })
+
+    if (!response.ok) {
+        throw new Error('Upload failed')
+    }
+
+    const data = await response.json()
+    return data.result.url as string
+}
+
+
+export interface TokenClass {
+    token_type: string,
+    chain_id: number,
+    chain: string,
+    address: string,
+    name: string,
+    symbol: string,
+    image_url: string,
+    publisher_address: string,
+    position: number,
+    description: string,
+    decimals: number,
+}
+
+export async function addTokenClass(props: TokenClass): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/add_token_class`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(props),
+    });
+    
+    await handleRequest<BaseResponse>(response)
+}
+
+export interface TokenClassResponse extends BaseResponse {
+    token_classes: TokenClass[]
+}
+
+export async function getTokenClass(): Promise<TokenClassResponse> {
+    const response = await fetch(`${API_BASE_URL}/get_token_classes`, {
+        headers: getAuthHeaders(),
+    });
+
+    return handleRequest<TokenClassResponse>(response);
+}
+
+
+// 上传交易记录
+export async function uploadTransactionWithGasCredits(transaction: TransactionRecord): Promise<BaseResponse> {
+    const response = await fetch(`${API_BASE_URL}/add_transaction_with_gas_credits`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(transaction),
+    });
+    return handleRequest<BaseResponse>(response);
 }

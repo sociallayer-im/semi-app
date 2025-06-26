@@ -3,9 +3,9 @@ import type { Address, Chain } from "viem"
 import { prepareClient } from "./utils/prepareClient"
 import { getSafeAccount, getVirtualSafeAccount } from "./account"
 import { erc20Abi, parseEther, toBytes, bytesToHex ,zeroAddress } from "viem"
-import { BUNDLER_URL, CREATE_CALL_CONTRACT } from "../config"
+import { BUNDLER_URL, CREATE_CALL_CONTRACT, TOKEN_FACTORY_CONTRACT } from "../config"
 import CreateCallAbi from "../deploy/CreateCall.abi.json"
-
+import {abi as tokenFactoryAbi} from "../deploy/MinimalFactory.json"
 
 export interface TransferOptions {
     to: Address
@@ -257,6 +257,47 @@ export const deploy = async ({ privateKey, chain, callData, sponsorFee=false }: 
             bytesToHex(toBytes(new Date().getTime().toString()), { size: 32 })
         ],
         to: CREATE_CALL_CONTRACT[chain.id],
+    } as const
+
+    const params = {
+        account: smartAccount,
+        calls: [tx],
+    }
+
+    const gasParams = await getGasParameters({ chain, smartAccount, tx, bundlerClient })
+    if (gasParams) {
+        Object.assign(params, gasParams)
+    }
+
+    return executeUserOperation(params, bundlerClient)
+}
+
+export interface DeployTokenOptions {
+    name: string
+    symbol: string
+    owner: Address
+    minter: Address
+    initMint?: string,
+    maxSupply: string,
+    privateKey: `0x${string}`,
+    sponsorFee?: boolean
+    chain: Chain
+
+}
+export const deployToken = async ({ privateKey, chain, name, symbol, owner, minter, initMint, maxSupply, sponsorFee=false }: DeployTokenOptions) => {
+    if (!TOKEN_FACTORY_CONTRACT[chain.id]) {
+        throw new Error('Token factory contract not found')
+    }
+    
+    const smartAccount = await getSafeAccount(privateKey, chain)
+    const { bundlerClient } = await prepareClient(chain, sponsorFee)
+
+
+    const tx = {
+        abi: tokenFactoryAbi,
+        functionName: 'createMinimal',
+        args: [name, symbol, owner, minter, initMint, maxSupply],
+        to: TOKEN_FACTORY_CONTRACT[chain.id],
     } as const
 
     const params = {

@@ -117,7 +117,7 @@ interface FormState {
     recipient: string | null
     amount: string
     code: string[]
-    token: TokenMetadata | undefined
+    token: TokenClass | undefined
     remainingFreeTransactions: number
     gasEstimate: string
 }
@@ -160,18 +160,21 @@ const formState = reactive<FormState>({
 })
 
 // 计算属性
-const nativeToken = computed(() => ({
+const nativeToken = computed((): TokenClass => ({
     address: zeroAddress,
     name: useChain.chain.nativeCurrency.name,
     symbol: useChain.chain.nativeCurrency.symbol,
     decimals: useChain.chain.nativeCurrency.decimals,
-    icon: '/images/eth_logo.png'
-} as TokenMetadata))
+    image_url: '/images/eth_logo.png',
+    chain_id: useChain.chain.id,
+    chain: useChain.chain.name.toLowerCase(),
+    token_type: 'NATIVE_COIN',
+    publisher_address: zeroAddress,
+    position: 0,
+    description: ''
+}))
 
-const tokenList = computed(() => {
-    const erc20TokenList = POPULAR_ERC20_TOKENS[useChain.chain.id] || []
-    return [nativeToken.value, ...erc20TokenList]
-})
+const tokenList = ref<TokenClass[]>([nativeToken.value])
 
 const isFormValid = computed(() => {
     if (!formState.to || !formState.amount) return false
@@ -313,9 +316,9 @@ const handleTokenTransfer = async () => {
 
         await uploadTransaction({
             tx_hash: receipt.receipt.transactionHash,
-            gas_used: (receipt.actualGasCost + receipt.receipt.effectiveGasPrice * BigInt(receipt.receipt.gasUsed)).toString(),
+            gas_used: receipt.actualGasCost.toString(),
             status: receipt.success ? 'success' : 'failed',
-            chain: useChain.chain.id,
+            chain: useChain.chain.name.toLowerCase(),
             data: JSON.stringify(receipt) as any
         })
 
@@ -333,7 +336,7 @@ const handleTokenTransfer = async () => {
     }
 }
 
-const initFormFromQuery = async () => {
+const initForm = async () => {
     const { to, amount, chain_id, token_address } = route.query
 
     // 处理链ID
@@ -347,8 +350,12 @@ const initFormFromQuery = async () => {
     }
 
     // 处理代币地址
+    const { token_classes } = await getTokenClass()
+    const currentTokenClasses = token_classes.filter(token => token.chain_id === useChain.chain.id)
+    tokenList.value = [nativeToken.value, ...currentTokenClasses]
+    
     if (token_address && typeof token_address === 'string') {
-        const targetToken = tokenList.value.find((token) => token.address === token_address)
+        const targetToken = currentTokenClasses.find((token) => token.address === token_address)
         formState.token = targetToken || nativeToken.value
         if (!targetToken) {
             handleError(new Error(i18n.text['Invalid token address']), i18n.text['Invalid token address'], i18n.text['Token address in URL is incorrect or unsupported token'])
@@ -429,5 +436,5 @@ const handleReset = () => {
 watch(() => formState.token, fetchTokenBalance, { immediate: true })
 
 // 生命周期
-onMounted(initFormFromQuery)
+onMounted(initForm)
 </script>

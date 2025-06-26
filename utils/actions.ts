@@ -29,10 +29,10 @@ const getAssetTransfers = async (
     alchemy: Alchemy,
     address: string,
     direction: 'from' | 'to',
-    chain: Chain
+    chain: Chain,
+    contractAddresses: string[]
 ) => {
     try {
-        const contractAddresses = POPULAR_ERC20_TOKENS[chain.id].map((token) => token.address);
         console.log('[contractAddresses]:', contractAddresses);
         const category = [AssetTransfersCategory.ERC20, AssetTransfersCategory.EXTERNAL]
         if (chain.id !== 10) {
@@ -80,14 +80,16 @@ export const getSendActions = async (safeAddress: string, chain: Chain) => {
     }
 }
 
-export const getReceiveActions = async (safeAddress: string, chain: Chain) => {
+export const getReceiveActions = async (safeAddress: string, chain: Chain, tokenClasses: TokenClass[]) => {
     const alchemy = getAlchemyInstance(chain);
-    const transfers = await getAssetTransfers(alchemy, safeAddress, 'to', chain);
-    return parseActionsFromAlchemyApi(transfers, chain, 'income');
+    const contractAddresses = tokenClasses.map((token) => token.address);
+    const transfers = await getAssetTransfers(alchemy, safeAddress, 'to', chain, contractAddresses);
+    return parseActionsFromAlchemyApi(transfers, chain, 'income', tokenClasses);
 }
 
-export const getSendActionsV2 = async (safeAddress: string, chain: Chain) => {
+export const getSendActionsV2 = async (safeAddress: string, chain: Chain, tokenClasses: TokenClass[]) => {
     const alchemy = getAlchemyInstance(chain);
-    const transfers = await getAssetTransfers(alchemy, safeAddress, 'from', chain);
-    return parseActionsFromAlchemyApi(transfers, chain, 'outgoing');
+    const contractAddresses = tokenClasses.map((token) => token.address);
+    const transfers = await getAssetTransfers(alchemy, safeAddress, 'from', chain, contractAddresses);
+    return parseActionsFromAlchemyApi(transfers, chain, 'outgoing', tokenClasses);
 }

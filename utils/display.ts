@@ -1,6 +1,5 @@
 import { formatUnits, type Chain, zeroAddress } from 'viem'
 import bignumber from 'bignumber.js'
-import { POPULAR_ERC20_TOKENS } from './balance/tokens'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/zh-cn'
@@ -59,8 +58,8 @@ export function parseSendActions(history: any[]) {
     return actions
 }
 
-export function parseActionsFromAlchemyApi(history: any[], chain: Chain, direction: 'income' | 'outgoing') {
-    const supportedTokens = POPULAR_ERC20_TOKENS[chain.id]
+export function parseActionsFromAlchemyApi(history: any[], chain: Chain, direction: 'income' | 'outgoing', tokenClasses: TokenClass[]) {
+    const supportedTokens = tokenClasses
     if (!supportedTokens) {
         throw new Error('Unsupported chain')
     }

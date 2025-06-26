@@ -66,7 +66,7 @@
                 v-for="balance in balances" @click="navigateTo(`/transfer?token_address=${balance.token.address}`)"
                 :key="balance.token.address">
                 <div class="flex items-center gap-3">
-                    <img :src="balance.token.icon" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />
+                    <img :src="balance.token.image_url" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />
                     <div>
                         <div class="font-medium">{{ balance.token.symbol }}</div>
                         <div class="text-gray-400 text-sm">{{ balance.token.name }}</div>
@@ -107,8 +107,10 @@ const handleGetData = async () => {
         loading.value = true
         data.safeAddress = user.value?.evm_chain_address as string
         data.balance = await getBalance(user.value?.evm_chain_address as `0x${string}`, network.value)
-        balances.value = (await getPopularERC20Balance(user.value?.evm_chain_address as `0x${string}`, network.value))
-            .sort((a, b) => Number(b.balance - a.balance))
+        const { token_classes } = await getTokenClass()
+        const currentTokenClasses = token_classes.filter(token => token.chain_id === network.value.id)
+        balances.value = (await getPopularERC20Balance(currentTokenClasses, user.value?.evm_chain_address as `0x${string}`, network.value))
+            .sort((a, b) => Number(b.token.position - a.token.position))
     } catch (error) {
         console.error(error)
         toast.add({

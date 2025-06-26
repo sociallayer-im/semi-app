@@ -34,10 +34,14 @@
     "Token Symbol": "Token Symbol",
     "Please enter token symbol": "Please enter token symbol",
     "Enable Pre-mint": "Enable Pre-mint",
-    "Recipient Address": "Recipient Address",
-    "Please enter recipient address": "Please enter recipient address",
-    "Initial Mint Amount": "Initial Mint Amount",
+    "Minter Address": "Minter Address",
+    "Please enter minter address": "Please enter minter address",
+    "Minter has the right to mint tokens": "Minter has the right to mint tokens",
+    "Initial Mint Amount": "Initial Mint Amount (optional)",
     "Please enter initial mint amount": "Please enter initial mint amount",
+    "Tokens will be sent to the minter": "Tokens will be sent to the minter",
+    "Icon": "Icon",
+    "Upload Icon": "Upload Icon",
     "Next": "Next",
     "Please enter 6-digit password": "Please enter 6-digit password",
     "Previous": "Previous",
@@ -161,5 +165,8 @@
     "Please enter 6-digit verification code": "Please enter 6-digit verification code",
     "Verification successful": "Verification successful",
     "Verification failed": "Verification failed",
-    "Please check if the verification code is correct": "Please check if the verification code is correct"
+    "Please check if the verification code is correct": "Please check if the verification code is correct",
+    "Deploy Factory": "Deploy Factory",
+    "Factory contract has been successfully deployed to blockchain": "Factory contract has been successfully deployed to blockchain",
+    "Upload Failed": "Upload Failed"
 }
