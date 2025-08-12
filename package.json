@@ -26,6 +26,7 @@
     "permissionless": "^0.2.47",
     "pinia": "^3.0.2",
     "qrcode.vue": "^3.6.0",
+    "solar-contract-sdk": "^0.0.3",
     "viem": "2.28.1",
     "vue": "^3.5.13",
     "vue-boring-avatars": "^1.4.0",
