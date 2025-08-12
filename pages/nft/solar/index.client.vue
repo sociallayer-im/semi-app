@@ -10,21 +10,21 @@
                 <NuxtLink href="/nft/solar/registry" class="hover:border-primary justify-between h-40 flex flex-1 flex-row gap-4 items-center border-[var(--ui-border)] border-2 rounded-xl p-4">
                     <div class="flex flex-col">
                         <span class="text-lg font-bold">Registry</span>
-                        <span class="text-sm text-gray-500">Intrace with Register contract</span>
+                        <span class="text-sm text-gray-500">Interact with Register contract</span>
                     </div>
                     <UIcon name="ci-chevron-right" size="36" class="text-gray-500 " />
                 </NuxtLink>
                 <NuxtLink href="/nft/solar/badge" class="hover:border-primary justify-between h-40 flex flex-1 flex-row gap-4 items-center border-[var(--ui-border)] border-2 rounded-xl p-4">
                     <div class="flex flex-col">
                         <span class="text-lg font-bold">Badge</span>
-                        <span class="text-sm text-gray-500">Intrace with Badge contract</span>
+                        <span class="text-sm text-gray-500">Interact with Badge contract</span>
                     </div>
                     <UIcon name="ci-chevron-right" size="36" class="text-gray-500 " />
                 </NuxtLink>
                 <NuxtLink href="/nft/solar/minter" class="hover:border-primary justify-between h-40 flex flex-1 flex-row gap-4 items-center border-[var(--ui-border)] border-2 rounded-xl p-4">
                     <div class="flex flex-col">
                         <span class="text-lg font-bold">Minter</span>
-                        <span class="text-sm text-gray-500">Intrace with Minter contract</span>
+                        <span class="text-sm text-gray-500">Interact with Minter contract</span>
                     </div>
                     <UIcon name="ci-chevron-right" size="36" class="text-gray-500 " />
                 </NuxtLink>
