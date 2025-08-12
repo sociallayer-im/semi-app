@@ -6,6 +6,7 @@
                 {{ i18n.text['Back'] }}
             </UButton>
             <div class="flex flex-col gap-4">
+                <div class="text-2xl font-bold text-center mb-4">Solar NFT</div>
                 <NuxtLink href="/nft/solar/registry" class="hover:border-primary justify-between h-40 flex flex-1 flex-row gap-4 items-center border-[var(--ui-border)] border-2 rounded-xl p-4">
                     <div class="flex flex-col">
                         <span class="text-lg font-bold">Registry</span>
