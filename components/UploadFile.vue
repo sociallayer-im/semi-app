@@ -85,12 +85,26 @@ const chooseFile = async (opts?: ChooseFileOption): Promise<File[]> => {
 
 const handleUploadIcon = async () => {
     try {
-        const files = await chooseFile({ accepts: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'] })
+        const files = await chooseFile({ accepts: ['image/png', 'image/jpeg', 'image/webp'] })
         const reader = new FileReader()
         reader.readAsDataURL(files[0])
         reader.onload = async () => {
+            const baseData = reader.result as string
+            let byteString
+            if (baseData!.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(baseData.split(',')[1])
+            else {
+                byteString = unescape(baseData.split(',')[1])
+            }
+            const mime_type = baseData.split(',')[0].split(':')[1].split(';')[0]
+            const ia = new Uint8Array(byteString.length)
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i)
+            }
+            const blob = new Blob([ia], { type: mime_type })
+
             uploading.value = true
-            const url = await uploadFile(reader.result as string, import.meta.env.VITE_SOLA_AUTH_TOKEN!)
+            const url = await uploadFile(blob, import.meta.env.VITE_SOLA_AUTH_TOKEN!)
             imageUrl.value = url
             uploading.value = false
         }

@@ -320,7 +320,7 @@ export async function getUserByHandleOrPhone(handleOrPhone: string): Promise<Use
     }
 }
 
-export async function uploadFile(file: string, authToken: string): Promise<string> {
+export async function uploadFile(file: Blob, authToken: string): Promise<string> {
     const formData = new FormData()
     formData.append('auth_token', authToken)
     formData.append('uploader', 'user')

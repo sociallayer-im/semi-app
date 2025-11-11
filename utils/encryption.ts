@@ -1,4 +1,6 @@
 import { mnemonicToAccount, generateMnemonic, english, privateKeyToAccount } from 'viem/accounts'
+import { isPrivateKey } from '~/utils'
+import { keccak256, toHex as stringToHex } from 'viem'
 
 // Generate a BIP39 mnemonic
 export function generateMnemonicPhrase() {
@@ -149,4 +151,18 @@ export async function keystoreToPrivateKey(keystore: Keystore, passcode: string)
   } else {
     return mnemonicToPrivateKey(decrypted)
   }
+}
+
+export function getNamehash(name: string): string {
+  let node = Buffer.alloc(32, 0);
+
+  if (name) {
+    const labels = name.split(".");
+    for (let i = labels.length - 1; i >= 0; i--) {
+      const labelSha = Buffer.from(keccak256(stringToHex(labels[i])).slice(2), "hex");
+      node = Buffer.from(keccak256(Buffer.concat([node, labelSha])).slice(2), "hex");
+    }
+  }
+
+  return "0x" + node.toString("hex");
 }

@@ -31,6 +31,12 @@
                 </div>
                 <span class="text-sm mt-1">{{ i18n.text.Activities }}</span>
             </div>
+            <div class="flex flex-col items-center cursor-pointer" @click="navigateTo('/badges')">
+                <div class="bg-blue-50 rounded-full w-14 h-14 flex items-center justify-center mb-1">
+                    <UIcon name="hugeicons:star-award-01" size="24" class="text-blue-500" />
+                </div>
+                <span class="text-sm mt-1">{{ i18n.text.Badges }}</span>
+            </div>
         </div>
 
         <!-- 分割线 -->
