@@ -12,6 +12,9 @@ export default defineNuxtConfig({
     '/api/**': {
       cors: true,
     },
+    '/metadata/**': {
+      cors: true,
+    },
   },
   app: {
     head: {

@@ -39,20 +39,7 @@ const _schema = i.schema({
       created_at: i.date(),
     }),
   },
-  links: {
-    badges_to_badge_classes: {
-      forward: {
-        on: "badges",
-        label: "badge_class",
-        has: "one",
-      },
-      reverse: {
-        on: "badge_classes",
-        label: "badges",
-        has: "many",
-      },
-    },
-  },
+  links: {},
   rooms: {},
 });
 
