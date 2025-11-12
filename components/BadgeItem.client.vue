@@ -1,7 +1,7 @@
 <template>
     <UModal :title="i18n.text['Badge Details']" :dismissible="false" v-model:open="showModal">
         <div @click="showModal = true"
-            class="flex flex-col items-center justify-center bg-gray-700 rounded-lg p-4 overflow-hidden gap-2 relative">
+            class="flex flex-col items-center justify-center bg-muted rounded-lg p-4 overflow-hidden gap-2 relative">
             <UBadge color="warning" size="sm" v-if="isPending" class="absolute top-2 right-2">{{ i18n.text['Pending'] }}</UBadge>
             <div class="flex items-center justify-center bg-gray-500 rounded-full overflow-hidden">
                 <img :src="badge.metadata.badge_image_url" class="w-16 h-16 rounded-full" alt=""></img>
