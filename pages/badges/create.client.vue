@@ -7,7 +7,7 @@
         </UButton>
 
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-bold">{{i18n.text['Create Badge']}}</h1>
+            <h1 class="text-2xl font-bold">{{ i18n.text['Create Badge'] }}</h1>
         </div>
 
         <div class="flex-1 overflow-y-auto">
@@ -31,8 +31,7 @@
                     <UFormField name="name" :label="i18n.text['Badge Name']">
                         <div class="flex flex-col gap-2">
                             <UInput variant="subtle" size="md" v-model="formState.name"
-                                :placeholder="i18n.text['Please enter badge name']"
-                                @blur="validateField('name')" />
+                                :placeholder="i18n.text['Please enter badge name']" @blur="validateField('name')" />
                             <span v-if="errors.name" class="text-sm text-error-500">{{ errors.name }}</span>
                         </div>
                     </UFormField>
@@ -70,6 +69,9 @@
                         {{ i18n.text['Create'] }}
                     </UButton>
                 </div>
+                <div v-if="isSubmitting" class="text-sm text-gray-100">
+                    {{ i18n.text['Create badge may take a few minutes to complete.'] }}
+                </div>
             </div>
         </div>
     </div>
@@ -78,6 +80,9 @@
 <script setup lang="ts">
 import { reactive, computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Profile } from '@/server/api/badge/types'
+import { waitForTransactionReceipt } from '@wagmi/core'
+import { client } from '@/utils/wagmi_config_client'
 
 const router = useRouter()
 const i18n = useI18n()
@@ -248,44 +253,109 @@ const handleNext = async () => {
 }
 
 const handleCreate = async () => {
-    console.log(pinCode.value)
-    console.log(formState)
     isSubmitting.value = true
-    const { data, error } = await useFetch('/api/badge/create-class', {
-        method: 'POST',
-        body: {
-            pin_code: pinCode.value.join(''),
-            keystore_json: user.user!.encrypted_keys,
+    const getProfileData = await $fetch<{ success: boolean, message: string, data: { profile: Profile } }>('/api/profile', {
+        method: 'GET',
+        query: {
             chain_id: useChain.chain.id,
-            class_name: formState.name,
-            class_description: formState.description,
-            class_image_url: formState.image_url,
+            wallet_address: user.user!.evm_chain_address,
         }
     })
-    isSubmitting.value = false
-    
-    console.log('create result', data, error)
-    if (error.value) {
+
+    if (!getProfileData.success) {
         toast.add({
-            title: t('Create failed', 'Create failed'),
-            description: error.value?.data?.message ?? t('Create failed', 'Create failed'),
+            title: t('Get profile failed', 'Get profile failed'),
+            description: getProfileData.message ?? t('Get profile failed', 'Get profile failed'),
             color: 'error'
         })
-    } else {
-        if (!data.value?.success) {
+        isSubmitting.value = false
+        return
+    }
+
+    const profile = getProfileData.data?.profile
+    if (!profile) {
+        // create profile
+        try {
+            const createProfileData = await $fetch<{ success: boolean, message: string, data: { profile_id: string, tx_hash: string } }>('/api/profile/create', {
+                method: 'POST',
+                body: {
+                    pin_code: pinCode.value.join(''),
+                    keystore_json: user.user!.encrypted_keys,
+                    chain_id: useChain.chain.id,
+                }
+            })
+
+            if (!createProfileData.success) {
+                toast.add({
+                    title: t('Create profile failed', 'Create profile failed'),
+                    description: createProfileData.message ?? t('Create profile failed', 'Create profile failed'),
+                    color: 'error'
+                })
+                isSubmitting.value = false
+                return
+            } else {
+                console.log('create profile tx hash', createProfileData.data.tx_hash)
+                await waitForTransactionReceipt(client, {
+                    hash: createProfileData.data.tx_hash as `0x${string}`,
+                    chainId: useChain.chain.id as any,
+                })
+            }
+        } catch (error) {
+            console.error(error)
             toast.add({
-                title: t('Create failed', 'Create failed'),
-                description: data.value?.message ?? t('Create failed', 'Create failed'),
+                title: t('Create profile failed', 'Create profile failed'),
+                description: error instanceof Error ? error.message : t('Create profile failed', 'Create profile failed'),
                 color: 'error'
             })
+            isSubmitting.value = false
+            return
+        }
+    }
+
+    try {
+        const createClassData = await $fetch<{ success: boolean, message: string, data: { class_id: string, profile_id: string, tx_hash: string } }>('/api/badge/create-class', {
+            method: 'POST',
+            body: {
+                pin_code: pinCode.value.join(''),
+                keystore_json: user.user!.encrypted_keys,
+                chain_id: useChain.chain.id,
+                class_name: formState.name,
+                class_description: formState.description,
+                class_image_url: formState.image_url,
+            }
+        })
+        
+        if (!createClassData.success) {
+            toast.add({
+                title: t('Create failed', 'Create failed'),
+                description: createClassData.message ?? t('Create failed', 'Create failed'),
+                color: 'error'
+            })
+            isSubmitting.value = false
+            return
         } else {
+            console.log('create class tx hash', createClassData.data.tx_hash)
+            await waitForTransactionReceipt(client, {
+                hash: createClassData.data.tx_hash as `0x${string}`,
+                chainId: useChain.chain.id as any,
+            })
             toast.add({
                 title: t('Create successful', 'Create successful'),
                 description: t('Create successful', 'Create successful'),
                 color: 'success'
             })
+            isSubmitting.value = false
             router.replace('/badges')
         }
+    } catch (error) {
+        console.error(error)
+        toast.add({
+            title: t('Create failed', 'Create failed'),
+            description: error instanceof Error ? error.message : t('Create failed', 'Create failed'),
+            color: 'error'
+        })
+        isSubmitting.value = false
+        return
     }
 }
 </script>

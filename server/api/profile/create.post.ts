@@ -9,7 +9,7 @@ import { id } from "@instantdb/admin";
 import { getProfileId, getBadgeClassId } from "@/server/utils";
 import { wagmi_config } from "@/server/utils/wagmi_config";
 import {
-  writeProfileRegistryRegisterClass,
+  writeProfileRegistryCreateProfile,
 } from "@/server/utils/solar_badge";
 import { sola_badge_contract_address } from "@/server/utils/solar_badge/contracts";
 
@@ -22,23 +22,9 @@ const chains = {
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const {
-    pin_code,
-    keystore_json,
-    chain_id,
-    class_name,
-    class_description,
-    class_image_url,
-  } = body;
+  const { pin_code, keystore_json, chain_id } = body;
 
-  if (
-    !pin_code ||
-    !keystore_json ||
-    !chain_id ||
-    !class_name ||
-    !class_description ||
-    !class_image_url
-  ) {
+  if (!pin_code || !keystore_json || !chain_id) {
     return {
       success: false,
       message: "Invalid parameters",
@@ -91,65 +77,45 @@ export default defineEventHandler(async (event) => {
 
   if (queryProfile.profiles.length === 0) {
     // create new profile
-    return {
-      success: false,
-      message: "Profile not found",
-    };
-  }
+    try {
+      const create_profile_hash = await writeProfileRegistryCreateProfile(
+        wagmi_config.client,
+        {
+          address: contract_addresses.profile_registry as `0x${string}`,
+          args: [
+            safe_account_address as `0x${string}`,
+            BigInt(profile_id),
+            true,
+          ],
+          chainId: chain.id,
+          account: wagmi_config.account,
+        }
+      );
+      console.log("create profile tx hash", create_profile_hash);
 
-  // register class
-  try {
-    const new_class_id = id();
-    const class_id = getBadgeClassId(
-      new_class_id,
-      safe_account_address,
-      chain.id
-    );
-    const create_class_hash = await writeProfileRegistryRegisterClass(
-      wagmi_config.client,
-      {
-        address: contract_addresses.profile_registry,
-        args: [
-          BigInt(profile_id),
-          BigInt(class_id),
-          contract_addresses.badgeUnbounded,
-        ],
-        chainId: chain.id,
-        account: wagmi_config.account,
-      }
-    );
-    console.log("create class tx hash", create_class_hash);
+      await db.transact([
+        db.tx.profiles[id()].create({
+          profile_id,
+          wallet_address: safe_account_address,
+          chain_id: chain.id,
+          tx_hash: create_profile_hash,
+        } as any),
+      ]);
 
-    await db.transact([
-      db.tx.badge_classes[new_class_id].create({
-        class_id,
-        chain_id: chain.id,
-        profile_id,
-        wallet_address: safe_account_address,
-        badge_contract_address: contract_addresses.badgeUnbounded,
-        metadata: {
-          class_name,
-          class_description,
-          class_image_url,
+      return {
+        success: true,
+        message: "Profile created successfully",
+        data: {
+          profile_id,
+          tx_hash: create_profile_hash,
         },
-        tx_hash: create_class_hash,
-      }),
-    ]);
-
-    return {
-      success: true,
-      message: "Class created successfully",
-      data: {
-        class_id,
-        profile_id,
-        tx_hash: create_class_hash,
-      },
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      success: false,
-      message: "Failed to register class",
-    };
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        message: "Failed to create profile",
+      };
+    }
   }
 });

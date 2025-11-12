@@ -209,5 +209,6 @@
     "Please enter badge description": "Please enter badge description",
     "Description": "Description",
     "Please upload badge image": "Please upload badge image",
-    "Send badges failed": "Send badges failed"
+    "Send badges failed": "Send badges failed",
+    "Create badge may take a few minutes to complete.": "Create badge may take a few minutes to complete."
 }

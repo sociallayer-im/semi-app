@@ -25,7 +25,7 @@
             <template #owned="{ item }">
                 <NoBadge v-if="ownedBadges.length === 0" />
                 <div class="grid grid-cols-3 gap-3 py-4" v-else>
-                    <BadgeItem @update="fetchOwnedBadges" :badge="badge" v-for="(badge, index) in ownedBadges"
+                    <BadgeItem :badge="badge" v-for="(badge, index) in ownedBadges"
                         :key="index" />
                 </div>
             </template>
@@ -38,7 +38,7 @@
             <template #pending="{ item }">
                 <NoBadge v-if="pendingBadges.length === 0" />
                 <div class="grid grid-cols-3 gap-3 py-4" v-else>
-                    <BadgeItem @update="fetchPendingBadges" :badge="badge" v-for="(badge, index) in pendingBadges"
+                    <BadgeItem @update="fetchData" :badge="badge" v-for="(badge, index) in pendingBadges"
                         :key="index" />
                 </div>
             </template>

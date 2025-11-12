@@ -209,5 +209,6 @@
     "Please enter badge description": "请输入徽章描述",
     "Description": "描述",
     "Please upload badge image": "请上传徽章图片",
-    "Send badges failed": "发送徽章失败"
+    "Send badges failed": "发送徽章失败",
+    "Create badge may take a few minutes to complete.": "创建徽章可能需要几分钟时间完成。"
 }

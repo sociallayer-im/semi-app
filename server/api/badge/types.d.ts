@@ -19,3 +19,10 @@ export interface Badge {
   status: string;
   created_at: Date;
 }
+
+export interface Profile {
+  profile_id: string;
+  wallet_address: string;
+  chain_id: number;
+  tx_hash: string;
+}

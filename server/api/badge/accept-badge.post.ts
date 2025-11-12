@@ -7,7 +7,6 @@ import { predictSafeAccountAddress } from "@/utils/SafeSmartAccount";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { wagmi_config } from "@/server/utils/wagmi_config";
 import { writeBadgeUnboundedMint } from "@/server/utils/solar_badge";
-import { waitForTransactionReceipt } from "@wagmi/core";
 
 const chains = {
   "11155111": sepolia,
@@ -119,11 +118,7 @@ export default defineEventHandler(async (event) => {
     });
 
     console.log('mint badge tx hash =>', tx);
-    await waitForTransactionReceipt(wagmi_config.client, {
-      hash: tx,
-      chainId: chain.id,
-    });
-
+   
     await db.transact([
       db.tx.badges[badge.id].update({ status: "accepted", tx_hash: tx }),
     ]);
