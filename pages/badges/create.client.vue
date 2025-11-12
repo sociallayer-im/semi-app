@@ -18,7 +18,7 @@
                             <div
                                 class="flex flex-col gap-2 ring ring-inset ring-accented rounded-md justify-center items-center">
                                 <div @click="uploadImage"
-                                    class="w-26 h-26 rounded-full overflow-hidden bg-gray-500 my-4 flex items-center justify-center">
+                                    class="w-26 h-26 rounded-full overflow-hidden bg-elevated my-4 flex items-center justify-center">
                                     <img v-if="formState.image_url" :src="formState.image_url" alt="badge image"
                                         class="object-cover w-full h-full" />
                                     <UIcon name="i-heroicons-photo" class="text-4xl" v-else />
