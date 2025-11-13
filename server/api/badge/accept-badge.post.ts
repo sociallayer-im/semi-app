@@ -113,7 +113,7 @@ export default defineEventHandler(async (event) => {
         BigInt(badge.badge_id),
         BigInt(badge.class_id),
       ],
-      account: wagmi_config.account,
+      account: wagmi_config.admin_account(chain.id),
       chainId: chain.id,
     });
 

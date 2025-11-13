@@ -115,7 +115,7 @@ export default defineEventHandler(async (event) => {
           contract_addresses.badgeUnbounded,
         ],
         chainId: chain.id,
-        account: wagmi_config.account,
+        account: wagmi_config.admin_account(chain.id),
       }
     );
     console.log("create class tx hash", create_class_hash);

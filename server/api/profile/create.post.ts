@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
             true,
           ],
           chainId: chain.id,
-          account: wagmi_config.account,
+          account: wagmi_config.admin_account(chain.id),
         }
       );
       console.log("create profile tx hash", create_profile_hash);

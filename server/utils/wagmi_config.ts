@@ -12,9 +12,18 @@ export const client = createConfig({
   }
 });
 
-export const account = privateKeyToAccount(process.env.SOLA_BADGE_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`);
+export const admin_account = (chain_id: number) => {
+  switch (chain_id) {
+    case 11155111:
+      return privateKeyToAccount(process.env.SEPOLIA_SOLA_BADGE_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`);
+    case 10:
+      return privateKeyToAccount(process.env.OP_SOLA_BADGE_ADMIN_WALLET_PRIVATE_KEY as `0x${string}`);
+    default:
+      throw new Error('ACCOUNT_NOT_FOUND: Invalid chain id');
+  }
+}
 
 export const wagmi_config = {
     client,
-    account
+    admin_account
 }

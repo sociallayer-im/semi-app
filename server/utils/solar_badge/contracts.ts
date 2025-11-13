@@ -1,8 +1,13 @@
 export const sola_badge_contract_address = {
     '11155111': {
-        profile_registry: '0x7bC3Fd7c2DaED3b783D2a90C90b6F2776Bd4C40F',
-        badgeUnbounded: '0x01e82Be7Bd59482Ae63338Fe790376452Fe59778',
-        badgeBounded: '0x2B0eA2951395C4F0bc4b1c15B207dCE1758cd467' 
+        profile_registry: '0xC1B1157b9DE39AaE9658787dF96a685971146074',
+        badgeUnbounded: '0x19ef0b28A2f2F75403F3D7dDE79A2bBADC37bFDb',
+        badgeBounded: '0x8C33d5a518d8fe9F4609ec28Ca3143267A7B25B8' 
+    },
+    '10': {
+        profile_registry: '0xbC98c6ae42E9F18E4AB58C73D85990aEf2c0f5f6',
+        badgeUnbounded: '0x5145Ba5d5330cc701d45272c62bDa2916beE5CD0',
+        badgeBounded: '0xe944B14B2Ea934BBbf57bAf395d8a3B6527c928E' 
     }
 } as {
     [key: string]: {
