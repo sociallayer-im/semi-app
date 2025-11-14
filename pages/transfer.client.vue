@@ -13,7 +13,8 @@
                     <UFormField name="to" :label="i18n.text['Recipient (supports address or phone number)']">
                         <div class="flex items-start flex-row gap-2">
                             <UTextarea size="xl" class="w-full" variant="subtle" v-model="formState.to"
-                                :placeholder="i18n.text['Please enter recipient address/phone number']" :ui="{ base: 'w-full' }" :disabled="initializing" />
+                                :placeholder="i18n.text['Please enter recipient address/phone number']"
+                                :ui="{ base: 'w-full' }" :disabled="initializing" />
                             <div class="flex flex-col gap-2">
                                 <UButton icon="ci:close-md" color="neutral" variant="subtle" size="xl"
                                     class="text-2xl cursor-pointer" @click="formState.to = ''">
@@ -27,7 +28,8 @@
                         <div class="flex items-center gap-2">
                             <TokenSwitch :token-list="tokenList" v-model="formState.token" v-if="formState.token" />
                             <UInput variant="subtle" size="xl" class="w-full flex-1" v-model="formState.amount"
-                                :placeholder="i18n.text['Please enter send amount']" :ui="{ base: 'w-full' }" :disabled="initializing || !balance" />
+                                :placeholder="i18n.text['Please enter send amount']" :ui="{ base: 'w-full' }"
+                                :disabled="initializing || !balance" />
                         </div>
                     </UFormField>
 
@@ -110,6 +112,7 @@ import { getUserByHandleOrPhone, getRemainingGasCredits, uploadTransaction } fro
 import { isGasSponsorshipChain } from '~/utils/gas_sponsorship'
 import type { TokenMetadata } from '@/utils/balance/tokens'
 import { isPhoneNumber } from '~/utils'
+import { serializeError } from 'serialize-error';
 
 // 类型定义
 interface FormState {
@@ -191,14 +194,28 @@ const isCodeComplete = computed(() => {
 const getErrorMessage = (error: unknown): string => {
     if (!(error instanceof Error)) return i18n.text['Please try again later']
     if (!error.message) return i18n.text['Please try again later']
-    
+
     return error.message.includes(
         "Smart Account does not have sufficient funds to execute the User Operation"
     ) ? i18n.text['Insufficient balance to pay gas fees'] : error.message
 }
 
 const handleError = (error: unknown, title: string, description?: string) => {
-    console.error(error)
+    console.error(error);
+    try {
+        $fetch('/api/log-error', {
+            method: 'POST',
+            body: {
+                error: serializeError(error),
+                href: window.location.href,
+                info: formState,
+                wallet_address: user.user?.evm_chain_address
+            }
+        })
+    } catch (error) {
+        console.warn('Failed to log error to server', error);
+    }
+
     toast.add({
         title,
         description: description || (error instanceof Error ? error.message : i18n.text['Please try again later']),
@@ -239,7 +256,7 @@ const fetchTokenBalance = async () => {
 
 const validateBalance = (): boolean => {
     if (!formState.token) return false
-    
+
     const amount = Number(formState.amount) * 10 ** (formState.token.decimals as number)
     if (amount > Number(balance.value)) {
         handleError(new Error(i18n.text['Insufficient balance']), i18n.text['Insufficient balance'])
@@ -309,10 +326,10 @@ const handleTokenTransfer = async () => {
             ? transfer(transferParams)
             : transferErc20(transferParams))
 
-        // 解决BigInt序列化问题
-        ;(BigInt.prototype as any).toJSON = function () {
-            return this.toString()
-        }
+            // 解决BigInt序列化问题
+            ; (BigInt.prototype as any).toJSON = function () {
+                return this.toString()
+            }
 
         await uploadTransaction({
             tx_hash: receipt.receipt.transactionHash,
@@ -353,7 +370,7 @@ const initForm = async () => {
     const { token_classes } = await getTokenClass()
     const currentTokenClasses = token_classes.filter(token => token.chain_id === useChain.chain.id)
     tokenList.value = [nativeToken.value, ...currentTokenClasses]
-    
+
     if (token_address && typeof token_address === 'string') {
         const targetToken = currentTokenClasses.find((token) => token.address === token_address)
         formState.token = targetToken || nativeToken.value
@@ -391,7 +408,7 @@ const onSubmit = async () => {
         if (!validateBalance()) return
 
         loading.value = true
-        
+
         // 解析接收地址
         if (!(await resolveRecipient())) {
             loading.value = false

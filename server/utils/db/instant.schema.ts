@@ -38,6 +38,13 @@ const _schema = i.schema({
       status: i.string().indexed(),
       created_at: i.date(),
     }),
+    errors: i.entity({
+      error: i.json().optional(),
+      href: i.string().indexed().optional(),
+      info: i.json().optional(),
+      created_at: i.date().indexed().optional(),
+      wallet_address: i.string().indexed().optional(),
+    }),
   },
   links: {},
   rooms: {},
