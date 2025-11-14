@@ -303,12 +303,18 @@ const handleTokenTransfer = async () => {
     if (!formState.token || !formState.recipient) return
 
     loading.value = true
+    let privateKey = ''
     try {
-        const privateKey = await keystoreToPrivateKey(
+         privateKey = await keystoreToPrivateKey(
             JSON.parse(user.user?.encrypted_keys as string),
             formState.code.join('')
         )
-
+    } catch (error) {
+        handleError(error, i18n.text['Invalid passcode'], '')
+        return false
+    }
+    
+    try {
         const transferParams: TransferParams = {
             to: formState.recipient as `0x${string}`,
             amount: formState.amount,

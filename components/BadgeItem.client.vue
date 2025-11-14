@@ -2,7 +2,8 @@
     <UModal :title="i18n.text['Badge Details']" :dismissible="false" v-model:open="showModal">
         <div @click="showModal = true"
             class="flex flex-col items-center justify-center bg-muted rounded-lg p-4 overflow-hidden gap-2 relative">
-            <UBadge color="warning" size="sm" v-if="isPending" class="absolute top-2 right-2">{{ i18n.text['Pending'] }}</UBadge>
+            <UBadge color="warning" size="sm" v-if="isPending" class="absolute top-2 right-2">{{ i18n.text['Pending'] }}
+            </UBadge>
             <div class="flex items-center justify-center bg-gray-500 rounded-full overflow-hidden">
                 <img :src="badge.metadata.badge_image_url" class="w-16 h-16 rounded-full" alt=""></img>
             </div>
@@ -22,16 +23,34 @@
                 </div>
                 <div class="flex flex-col gap-2 w-full overflow-x-auto bg-muted p-2 rounded-lg">
                     <div class="flex flex-row items-start justify-between gap-2" v-if="badge.tx_hash">
-                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">{{ i18n.text['Tx Hash'] }}</div>
-                        <div class="break-all text-xs text-right">{{ badge.tx_hash }}</div>
+                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">{{ i18n.text['Tx Hash']
+                            }}</div>
+                        <div class="break-all text-xs text-right">
+                            {{ badge.tx_hash }}
+                            <div>
+                                <span color="info" variant="ghost" size="xs"
+                                    class="py-0 p-1inline-flex items-center ml-2 flex-1 justify-center text-blue-500 text-xs cursor-pointer hover:underline"
+                                    @click="toExplorer(badge.tx_hash)">
+                                    {{ i18n.text['Block Explorer'] }}
+                                </span>
+                                <span color="info" variant="ghost" size="xs"
+                                    class="py-0 p-1inline-flex items-center ml-2 flex-1 justify-center text-blue-500 text-xs cursor-pointer hover:underline"
+                                    @click="handleCopy(badge.tx_hash)">
+                                    {{ i18n.text['Copy'] }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex flex-row items-start justify-between gap-2">
-                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">{{ i18n.text['Published At'] }}</div>
+                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">
+                            {{ i18n.text['Published At'] }}
+                        </div>
                         <div class="text-xs text-right">{{ dayjs(badge.created_at).format('YYYY-MM-DD HH:mm:ss') }}
                         </div>
                     </div>
                     <div class="flex flex-row items-start justify-between gap-2">
-                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">{{ i18n.text['Owner'] }}</div>
+                        <div class="font-bold text-xs text-gray-500 whitespace-nowrap min-w-22">{{ i18n.text['Owner'] }}
+                        </div>
                         <div class="text-xs break-all text-right">{{ badge.wallet_address }}</div>
                     </div>
                 </div>
@@ -41,8 +60,8 @@
         <template #footer>
             <div class="flex justify-center gap-4 w-full" v-if="isOwner && isPending">
                 <UModal title="Input PIN Code" v-model:open="showRejectPINCode">
-                    <UButton color="neutral" size="xl" class="flex-1 justify-center" :disabled="acceptLoading || rejectLoading"
-                        :loading="rejectLoading"
+                    <UButton color="neutral" size="xl" class="flex-1 justify-center"
+                        :disabled="acceptLoading || rejectLoading" :loading="rejectLoading"
                         @click="showRejectPINCode = true">
                         {{ i18n.text['Reject'] }}
                     </UButton>
@@ -63,8 +82,9 @@
                 </UModal>
 
                 <UModal title="Input PIN Code" v-model:open="showAcceptPINCode">
-                    <UButton color="primary" size="xl" class="flex-1 justify-center" :disabled="acceptLoading || rejectLoading"
-                        :loading="acceptLoading" @click="showAcceptPINCode = true">{{ i18n.text['Accept'] }}</UButton>
+                    <UButton color="primary" size="xl" class="flex-1 justify-center"
+                        :disabled="acceptLoading || rejectLoading" :loading="acceptLoading"
+                        @click="showAcceptPINCode = true">{{ i18n.text['Accept'] }}</UButton>
                     <template #body>
                         <UPinInput variant="subtle" type="number" v-model="pinCode" :length="CODE_LENGTH" size="xl"
                             class="w-full" :ui="{ base: 'w-full' }" mask />
@@ -112,6 +132,7 @@ const showRejectPINCode = ref(false)
 const showModal = ref(false)
 const acceptLoading = ref(false)
 const rejectLoading = ref(false)
+const useChain = useChainStore()
 
 const CODE_LENGTH = 6
 const DEFAULT_CODE = Array(CODE_LENGTH).fill('')
@@ -221,5 +242,19 @@ const handleRejectBadge = async () => {
     } finally {
         rejectLoading.value = false
     }
+}
+
+const toExplorer = (address: string) => {
+    const url = useChain.chain.blockExplorers?.default?.url
+    window.open(`${url}/tx/${address}`, '_blank')
+}
+
+const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    toast.add({
+        title: i18n.text['Copy Success'],
+        description: '',
+        color: 'success'
+    })
 }
 </script>
