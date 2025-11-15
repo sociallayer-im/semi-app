@@ -50,7 +50,7 @@ const MOCK_RESPONSE = false
 async function handleRequest<T>(response: Response): Promise<T> {
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || '请求失败');
+        throw new Error(error.error || error.message || '请求失败');
     }
     return response.json();
 }
