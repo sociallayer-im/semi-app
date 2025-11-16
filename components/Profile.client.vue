@@ -124,6 +124,7 @@ const handleGetData = async () => {
             description: i18n.text['Please try again later'],
             color: 'error'
         })
+        balances.value = []
     } finally {
         loading.value = false
     }
