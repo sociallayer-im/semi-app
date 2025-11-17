@@ -75,38 +75,82 @@
           <UFormField name="receiver_addresses" :label="i18n.text['Receiver Addresses']">
             <div class="flex flex-col gap-3">
               <div
-                v-for="(address, index) in formState.receiver_addresses"
+                v-for="(receiver, index) in formState.receivers"
                 :key="`receiver-${index}`"
                 class="flex items-start gap-2"
               >
+              <UInput
+                  icon="ci:user"
+                  v-if="receiver.input !== receiver.wallet"
+                  variant="subtle"
+                  :model-value="receiver.input"
+                  readonly
+                />
                 <UInput
+                  icon="uil:wallet"
                   variant="subtle"
                   size="md"
-                  v-model="formState.receiver_addresses[index]"
-                  :placeholder="i18n.text['Please enter receiver address']"
-                  @blur="validateField('receiver_addresses')"
+                  :model-value="receiver.wallet"
+                  readonly
                   class="flex-1"
                 />
                 <UButton
-                  v-if="formState.receiver_addresses.length > 1"
                   color="neutral"
                   variant="ghost"
                   icon="i-heroicons-trash"
                   :aria-label="i18n.text['Remove receiver']"
                   type="button"
+                  size="xl"
                   @click="removeReceiver(index)"
                 />
               </div>
               <div class="flex items-center gap-3">
-                <UButton
-                  color="primary"
-                  variant="soft"
-                  icon="i-heroicons-plus-circle"
-                  type="button"
-                  @click="addReceiver"
-                >
-                  {{ i18n.text["Add Receiver"] }}
-                </UButton>
+                <UModal :title="i18n.text['Add Receiver']" v-model:open="showAddReceiverModal">
+                  <UButton
+                    color="primary"
+                    variant="soft"
+                    icon="i-heroicons-plus-circle"
+                    type="button"
+                    @click="showAddReceiverModal = true"
+                  >
+                    {{ i18n.text["Add Receiver"] }}
+                  </UButton>
+                  <template #body>
+                    <div class="flex flex-col gap-3">
+                      <div>{{ i18n.text["Please enter recipient address/phone number"] }}</div>
+                      <UInput
+                        variant="subtle"
+                        size="lg"
+                        v-model="newReceiverInput"
+                        @keyup.enter="handleConfirmAddReceiver"
+                      />
+                      <span v-if="addReceiverError" class="text-sm text-error-500">{{
+                        addReceiverError
+                      }}</span>
+                    </div>
+                  </template>
+                  <template #footer>
+                    <div class="flex justify-center gap-3 w-full">
+                      <UButton
+                        color="neutral"
+                        size="xl"
+                        class="flex-1 justify-center"
+                        @click="handleCancelAddReceiver"
+                      >
+                        {{ i18n.text["Cancel"] }}
+                      </UButton>
+                      <UButton
+                        size="xl"
+                        color="primary"
+                         class="flex-1 justify-center"
+                        @click="handleConfirmAddReceiver"
+                        :loading="isValidatingReceiver"
+                      >
+                        {{ i18n.text["Confirm"] }}
+                      </UButton>
+                    </div>
+                  </template>
+                </UModal>
               </div>
               <span v-if="errors.receiver_addresses" class="text-sm text-error-500">{{
                 errors.receiver_addresses
@@ -208,6 +252,8 @@
 <script setup lang="ts">
 import type { BadgeClass } from "@/server/api/badge/types";
 import { isAddress } from "viem";
+import { getUserByHandleOrPhone } from "~/utils/semi_api";
+import { isPhoneNumber } from "~/utils";
 
 const route = useRoute();
 const useChain = useChainStore();
@@ -229,11 +275,16 @@ const translation = computed<Record<string, string>>(() => i18n.text as Record<s
 
 const t = (key: string, fallback: string) => translation.value[key] ?? fallback;
 
+interface Receiver {
+  input: string;
+  wallet: string;
+}
+
 interface FormState {
   image_url: string;
   name: string;
   description: string;
-  receiver_addresses: string[];
+  receivers: Receiver[];
 }
 
 interface FormErrors {
@@ -247,8 +298,13 @@ const formState = reactive<FormState>({
   image_url: "",
   name: "",
   description: "",
-  receiver_addresses: [""],
+  receivers: [],
 });
+
+const showAddReceiverModal = ref(false);
+const newReceiverInput = ref("");
+const addReceiverError = ref("");
+const isValidatingReceiver = ref(false);
 
 const errors = reactive<FormErrors>({
   image_url: "",
@@ -345,15 +401,60 @@ const uploadImage = async () => {
 
 fetchBadgeClass();
 
-const addReceiver = () => {
-  formState.receiver_addresses.push("");
+const handleCancelAddReceiver = () => {
+  showAddReceiverModal.value = false;
+  newReceiverInput.value = "";
+  addReceiverError.value = "";
+};
+
+const handleConfirmAddReceiver = async () => {
+  const input = newReceiverInput.value.trim();
+  if (!input) {
+    addReceiverError.value = i18n.text["Please enter recipient address/phone number"] || "Please enter recipient address/phone number";
+    return;
+  }
+
+  isValidatingReceiver.value = true;
+  addReceiverError.value = "";
+
+  try {
+    // 检查是否是合法的以太坊地址
+    if (isAddress(input)) {
+      formState.receivers.push({
+        input: input,
+        wallet: input,
+      });
+      handleCancelAddReceiver();
+      validateField("receiver_addresses");
+    } else if (isPhoneNumber(input)) {
+      // 检查是否是手机号
+      const user = await getUserByHandleOrPhone(input);
+      if (user?.evm_chain_address) {
+        formState.receivers.push({
+          input: input,
+          wallet: user.evm_chain_address,
+        });
+        handleCancelAddReceiver();
+        validateField("receiver_addresses");
+      } else {
+        addReceiverError.value = i18n.text["Invalid phone number"] || "Invalid phone number";
+      }
+    } else {
+      addReceiverError.value = i18n.text["Invalid address"] || "Invalid address";
+    }
+  } catch (error) {
+    console.error("Error validating receiver:", error);
+    addReceiverError.value = i18n.text["Please check if the phone number is correct"] || "Please check if the phone number is correct";
+  } finally {
+    isValidatingReceiver.value = false;
+  }
 };
 
 const removeReceiver = (index: number) => {
-  if (formState.receiver_addresses.length <= 1) {
+  if (formState.receivers.length <= 0) {
     return;
   }
-  formState.receiver_addresses.splice(index, 1);
+  formState.receivers.splice(index, 1);
   validateField("receiver_addresses");
 };
 
@@ -376,7 +477,7 @@ const handleCreate = async () => {
       badge_name: formState.name,
       badge_description: formState.description,
       badge_image_url: formState.image_url,
-      receiver_addresses: formState.receiver_addresses,
+      receiver_addresses: formState.receivers.map((r) => r.wallet),
       class_id: classId,
     },
   });
@@ -402,13 +503,29 @@ const handleCreate = async () => {
         description: i18n.text["Send badges successful"],
         color: "success",
       });
-      formState.receiver_addresses = [""];
+      formState.receivers = [];
       step.value = 3;
     }
   }
 };
 
-const validateField = (field: keyof FormState) => {
+const validateField = (field: keyof FormState | "receiver_addresses") => {
+  if (field === "receiver_addresses") {
+    const receivers = formState.receivers.filter((r) => r.wallet.trim());
+    if (!receivers.length) {
+      errors.receiver_addresses = t(
+        "Please enter at least one receiver address",
+        "Please enter at least one receiver address"
+      );
+      return;
+    }
+    const hasInvalidAddress = receivers.some((receiver) => !isAddress(receiver.wallet));
+    errors.receiver_addresses = hasInvalidAddress
+      ? t("Invalid address", "Invalid address")
+      : "";
+    return;
+  }
+
   const value = formState[field];
   switch (field) {
     case "image_url":
@@ -426,21 +543,6 @@ const validateField = (field: keyof FormState) => {
         ? ""
         : t("Please enter badge description", "Please enter badge description");
       break;
-    case "receiver_addresses": {
-      const addresses = (value as string[]).map((address) => address.trim()).filter(Boolean);
-      if (!addresses.length) {
-        errors.receiver_addresses = t(
-          "Please enter at least one receiver address",
-          "Please enter at least one receiver address"
-        );
-        break;
-      }
-      const hasInvalidAddress = addresses.some((address) => !isAddress(address));
-      errors.receiver_addresses = hasInvalidAddress
-        ? t("Invalid wallet address", "Invalid wallet address")
-        : "";
-      break;
-    }
     default:
       break;
   }
@@ -450,12 +552,13 @@ const validateForm = () => {
   (Object.keys(formState) as Array<keyof FormState>).forEach((field) => {
     validateField(field);
   });
+  validateField("receiver_addresses");
 
   return !Object.values(errors).some(Boolean);
 };
 
 watch(
-  () => formState.receiver_addresses,
+  () => formState.receivers,
   () => {
     if (errors.receiver_addresses) {
       validateField("receiver_addresses");

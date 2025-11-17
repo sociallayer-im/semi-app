@@ -431,6 +431,7 @@ const HandleDeployToken = async () => {
       status: receipt.success ? "success" : "failed",
       chain: useChain.chain.name.toLowerCase(),
       data: JSON.stringify(receipt) as any,
+      memo: "",
     });
 
     step.value = 3;

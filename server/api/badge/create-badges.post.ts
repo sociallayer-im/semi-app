@@ -4,10 +4,7 @@ import { predictSafeAccountAddress } from "@/utils/SafeSmartAccount";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { id } from "@instantdb/admin";
 import { getProfileId, getBadgeId } from "@/server/utils";
-import { wagmi_config } from "@/server/utils/wagmi_config";
-import { writeBadgeBoundedMintBatch } from "@/server/utils/solar_badge";
 import { sola_badge_contract_address } from "@/server/utils/solar_badge/contracts";
-import { waitForTransactionReceipt } from "@wagmi/core";
 
 const chains = {
   "11155111": sepolia,
