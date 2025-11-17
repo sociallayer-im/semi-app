@@ -403,3 +403,51 @@ export async function uploadTransactionWithGasCredits(
   });
   return handleRequest<BaseResponse>(response);
 }
+
+// 发送邮箱验证码
+export async function sendEmailCode(email: string): Promise<BaseResponse> {
+  const response = await fetch(`${API_BASE_URL}/send_email`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ email }),
+  });
+  return handleRequest<BaseResponse>(response);
+}
+
+// 登录响应接口
+interface SignInWithEmailResponse extends BaseResponse {
+    auth_token: string;
+    email: string;
+    id: string;
+    address_type: "email";
+  }
+
+// 使用手机号和验证码登录
+export async function signInWithEmail(email: string, code: string): Promise<SignInWithEmailResponse> {
+    // mock
+    const moc_response = {
+      result: "ok",
+      auth_token: "1234567890",
+      email: email,
+      id: "1234567890",
+      address_type: "email",
+    } as SignInWithEmailResponse;
+  
+    if (MOCK_RESPONSE) {
+      setAuthToken("1234567890");
+      return moc_response;
+    }
+  
+    const response = await fetch(`${API_BASE_URL}/signin_with_email`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ email, code }),
+    });
+    
+    const data = await handleRequest<SignInWithEmailResponse>(response);
+    if (data.auth_token) {
+      setAuthToken(data.auth_token);
+    }
+    return data;
+  }
+  

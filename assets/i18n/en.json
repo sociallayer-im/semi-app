@@ -214,5 +214,12 @@
   "View in Explorer": "View in Explorer",
   "Invalid passcode": "Invalid passcode",
   "Memo(optional)": "Memo(optional)",
-  "Please enter memo": "Please enter memo"
+  "Please enter memo": "Please enter memo",
+  "Please enter email": "Please enter email",
+  "Enter your login email": "Enter your login email",
+  "Please enter correct email": "Please enter correct email",
+  "Verify email": "Verify email",
+  "Please enter the verification code received by email": "Please enter the verification code received by email",
+  "Login with email": "Login with email",
+  "Login with phone number": "Login with phone number"
 }

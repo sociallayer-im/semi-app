@@ -11,14 +11,15 @@
     </UButton>
     <div class="flex flex-col items-center justify-center h-full gap-4 py-8 w-[80%] mx-auto">
       <h1 class="text-2xl font-bold">{{ i18n.text.Login }}</h1>
-      <div>{{ i18n.text["Enter your login phone number"] }}</div>
+      <div>{{ i18n.text["Enter your login email"] }}</div>
       <UForm :state="formState" @submit="onSubmit" class="w-full">
-        <UFormField name="phone">
+        <UFormField name="email">
           <UInput
+            type="email"
             size="xl"
             class="w-full"
-            v-model="formState.phone"
-            :placeholder="i18n.text['Please enter phone number']"
+            v-model="formState.email"
+            :placeholder="i18n.text['Please enter email']"
             :ui="{ base: 'w-full' }"
             :disabled="loading"
             variant="subtle"
@@ -30,14 +31,15 @@
           class="w-full mt-4 flex justify-center items-center"
           size="xl"
           :loading="loading"
-          :disabled="loading || !formState.phone"
+          :disabled="loading || !formState.email"
         >
           {{ i18n.text.Next }}
         </UButton>
       </UForm>
+
       <div class="text-sm text-gray-500 flex justify-end w-full">
-        <NuxtLink href="/email-login" class="text-primary flex items-center gap-1">
-          <UIcon name="ci:mail" class="text-base" /> {{ i18n.text["Login with email"] }} 
+        <NuxtLink href="/login" class="text-primary flex items-center gap-1">
+          <UIcon name="ci:phone" class="text-base" /> {{ i18n.text["Login with phone number"] }} 
         </NuxtLink>
       </div>
     </div>
@@ -45,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { sendSMS } from "~/utils/semi_api";
+import { sendEmailCode } from "~/utils/semi_api";
 
 definePageMeta({
   layout: "unauth",
@@ -57,25 +59,25 @@ const toast = useToast();
 const i18n = useI18n();
 
 const formState = reactive({
-  phone: "",
+  email: "",
 });
 
-const validatePhone = (value: string) => {
-  if (!value) return i18n.text["Please enter phone number"];
-  if (!/^\d{11}$/.test(value)) return i18n.text["Please enter phone number"];
+const validateEmail = (value: string) => {
+  if (!value) return i18n.text["Please enter email"];
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return i18n.text["Please enter email"];
   return true;
 };
 
 const onSubmit = async () => {
   loading.value = true;
   try {
-    const validation = validatePhone(formState.phone);
+    const validation = validateEmail(formState.email);
     if (validation === true) {
-      await sendSMS(formState.phone);
-      await router.push(`/verifyphone?phone=${formState.phone}`);
+      await sendEmailCode(formState.email);
+      await router.push(`/verifyemail?email=${formState.email}`);
     } else {
       toast.add({
-        title: i18n.text["Please enter correct phone number"],
+        title: i18n.text["Please enter correct email"],
         description: validation,
         color: "error",
       });
