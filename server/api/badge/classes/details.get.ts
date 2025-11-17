@@ -13,7 +13,9 @@ export default defineEventHandler(async (event) => {
 
   const queryClass = await db.query({
     badge_classes: {
-      $: { where: { class_id: class_id.toString(), chain_id: Number(chain_id) } },
+      $: {
+        where: { class_id: class_id.toString(), chain_id: Number(chain_id) },
+      },
     },
   });
 

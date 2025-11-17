@@ -1,8 +1,5 @@
 import db from "@/server/utils/db";
-import {
-  keystoreToPrivateKey,
-  privateKeyToSafeAccount,
-} from "@/utils/encryption";
+import { keystoreToPrivateKey, privateKeyToSafeAccount } from "@/utils/encryption";
 import { predictSafeAccountAddress } from "@/utils/SafeSmartAccount";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { wagmi_config } from "@/server/utils/wagmi_config";
@@ -36,10 +33,7 @@ export default defineEventHandler(async (event) => {
 
   let eoa_address = "0x0000000000000000000000000000000000000000";
   try {
-    const private_key = await keystoreToPrivateKey(
-      JSON.parse(keystore_json),
-      pin_code
-    );
+    const private_key = await keystoreToPrivateKey(JSON.parse(keystore_json), pin_code);
     eoa_address = privateKeyToSafeAccount(private_key as `0x${string}`);
   } catch (error) {
     console.error(error);
@@ -108,21 +102,15 @@ export default defineEventHandler(async (event) => {
   try {
     const tx = await writeBadgeUnboundedMint(wagmi_config.client, {
       address: badgeclass.badge_contract_address as `0x${string}`,
-      args: [
-        badge.wallet_address,
-        BigInt(badge.badge_id),
-        BigInt(badge.class_id),
-      ],
+      args: [badge.wallet_address, BigInt(badge.badge_id), BigInt(badge.class_id)],
       account: wagmi_config.admin_account(chain.id),
       chainId: chain.id,
     });
 
-    console.log('mint badge tx hash =>', tx);
-   
-    await db.transact([
-      db.tx.badges[badge.id].update({ status: "accepted", tx_hash: tx }),
-    ]);
-    
+    console.log("mint badge tx hash =>", tx);
+
+    await db.transact([db.tx.badges[badge.id].update({ status: "accepted", tx_hash: tx })]);
+
     return {
       success: true,
       message: "Badge accepted successfully",

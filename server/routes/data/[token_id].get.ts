@@ -10,10 +10,12 @@ export default defineEventHandler(async (event) => {
   }
 
   // 将十六进制字符串填充到64个字符（32字节），以匹配 getNamehash 的固定长度格式
-  const token_id_hash = "0x" + BigInt(token_id).toString(16).padStart(64, '0');
+  const token_id_hash = "0x" + BigInt(token_id).toString(16).padStart(64, "0");
 
-
-  console.log('token_id_hash', token_id_hash === '0x0342cef1b0951f11480f74dce03cde5b552e9dd88bb8579a292f235b68ca9cdd');
+  console.log(
+    "token_id_hash",
+    token_id_hash === "0x0342cef1b0951f11480f74dce03cde5b552e9dd88bb8579a292f235b68ca9cdd"
+  );
 
   const queryBadge = await db.query({
     badges: {

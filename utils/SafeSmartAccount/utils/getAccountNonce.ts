@@ -1,12 +1,12 @@
-import type { Address, Client } from "viem"
-import { readContract } from "viem/actions"
-import { getAction } from "viem/utils"
+import type { Address, Client } from "viem";
+import { readContract } from "viem/actions";
+import { getAction } from "viem/utils";
 
 export type GetAccountNonceParams = {
-    address: Address
-    entryPointAddress: Address
-    key?: bigint
-}
+  address: Address;
+  entryPointAddress: Address;
+  key?: bigint;
+};
 
 /**
  * Returns the nonce of the account with the entry point.
@@ -35,41 +35,41 @@ export type GetAccountNonceParams = {
  * // Return 0n
  */
 export const getAccountNonce = async (
-    client: Client,
-    args: GetAccountNonceParams
+  client: Client,
+  args: GetAccountNonceParams
 ): Promise<bigint> => {
-    const { address, entryPointAddress, key = BigInt(0) } = args
+  const { address, entryPointAddress, key = BigInt(0) } = args;
 
-    return await getAction(
-        client,
-        readContract,
-        "readContract"
-    )({
-        address: entryPointAddress,
-        abi: [
-            {
-                inputs: [
-                    {
-                        name: "sender",
-                        type: "address"
-                    },
-                    {
-                        name: "key",
-                        type: "uint192"
-                    }
-                ],
-                name: "getNonce",
-                outputs: [
-                    {
-                        name: "nonce",
-                        type: "uint256"
-                    }
-                ],
-                stateMutability: "view",
-                type: "function"
-            }
+  return await getAction(
+    client,
+    readContract,
+    "readContract"
+  )({
+    address: entryPointAddress,
+    abi: [
+      {
+        inputs: [
+          {
+            name: "sender",
+            type: "address",
+          },
+          {
+            name: "key",
+            type: "uint192",
+          },
         ],
-        functionName: "getNonce",
-        args: [address, key]
-    })
-}
+        name: "getNonce",
+        outputs: [
+          {
+            name: "nonce",
+            type: "uint256",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+    ],
+    functionName: "getNonce",
+    args: [address, key],
+  });
+};

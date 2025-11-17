@@ -1,27 +1,27 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
-  compatibilityDate: '2025-05-15',
+  compatibilityDate: "2025-05-15",
   devtools: { enabled: false },
   ui: {
-    fonts: false
+    fonts: false,
   },
-  modules: ['@nuxt/icon', '@nuxt/ui', '@pinia/nuxt'],
-  css: ['~/assets/css/main.css'],
+  modules: ["@nuxt/icon", "@nuxt/ui", "@pinia/nuxt"],
+  css: ["~/assets/css/main.css"],
   routeRules: {
-    '/api/**': {
+    "/api/**": {
       cors: true,
     },
-    '/metadata/**': {
+    "/metadata/**": {
       cors: true,
     },
   },
   app: {
     head: {
-      title: '南塘数字身份', // default fallback title
+      title: "南塘数字身份", // default fallback title
       htmlAttrs: {
-        lang: 'zh-CN',
-      }
-    }
-  }
-})
+        lang: "zh-CN",
+      },
+    },
+  },
+});

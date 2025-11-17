@@ -1,16 +1,11 @@
 import db from "@/server/utils/db";
-import {
-  keystoreToPrivateKey,
-  privateKeyToSafeAccount,
-} from "@/utils/encryption";
+import { keystoreToPrivateKey, privateKeyToSafeAccount } from "@/utils/encryption";
 import { predictSafeAccountAddress } from "@/utils/SafeSmartAccount";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { id } from "@instantdb/admin";
 import { getProfileId, getBadgeClassId } from "@/server/utils";
 import { wagmi_config } from "@/server/utils/wagmi_config";
-import {
-  writeProfileRegistryRegisterClass,
-} from "@/server/utils/solar_badge";
+import { writeProfileRegistryRegisterClass } from "@/server/utils/solar_badge";
 import { sola_badge_contract_address } from "@/server/utils/solar_badge/contracts";
 
 const chains = {
@@ -22,14 +17,8 @@ const chains = {
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const {
-    pin_code,
-    keystore_json,
-    chain_id,
-    class_name,
-    class_description,
-    class_image_url,
-  } = body;
+  const { pin_code, keystore_json, chain_id, class_name, class_description, class_image_url } =
+    body;
 
   if (
     !pin_code ||
@@ -55,10 +44,7 @@ export default defineEventHandler(async (event) => {
 
   let eoa_address = "0x0000000000000000000000000000000000000000";
   try {
-    const private_key = await keystoreToPrivateKey(
-      JSON.parse(keystore_json),
-      pin_code
-    );
+    const private_key = await keystoreToPrivateKey(JSON.parse(keystore_json), pin_code);
     eoa_address = privateKeyToSafeAccount(private_key as `0x${string}`);
   } catch (error) {
     console.error(error);
@@ -100,24 +86,13 @@ export default defineEventHandler(async (event) => {
   // register class
   try {
     const new_class_id = id();
-    const class_id = getBadgeClassId(
-      new_class_id,
-      safe_account_address,
-      chain.id
-    );
-    const create_class_hash = await writeProfileRegistryRegisterClass(
-      wagmi_config.client,
-      {
-        address: contract_addresses.profile_registry,
-        args: [
-          BigInt(profile_id),
-          BigInt(class_id),
-          contract_addresses.badgeUnbounded,
-        ],
-        chainId: chain.id,
-        account: wagmi_config.admin_account(chain.id),
-      }
-    );
+    const class_id = getBadgeClassId(new_class_id, safe_account_address, chain.id);
+    const create_class_hash = await writeProfileRegistryRegisterClass(wagmi_config.client, {
+      address: contract_addresses.profile_registry,
+      args: [BigInt(profile_id), BigInt(class_id), contract_addresses.badgeUnbounded],
+      chainId: chain.id,
+      account: wagmi_config.admin_account(chain.id),
+    });
     console.log("create class tx hash", create_class_hash);
 
     await db.transact([

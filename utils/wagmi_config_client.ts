@@ -8,5 +8,5 @@ export const client = createConfig({
     [mainnet.id]: http(),
     [sepolia.id]: http(),
     [optimism.id]: http(),
-  }
+  },
 });

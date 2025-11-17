@@ -9,7 +9,7 @@ const rules = {
       update: "false",
       delete: "false",
     },
-  }
+  },
 } satisfies InstantRules;
 
 export default rules;

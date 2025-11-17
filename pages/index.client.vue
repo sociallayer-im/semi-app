@@ -1,9 +1,8 @@
 <script setup>
-import { useUserStore } from '~/stores/user'
+import { useUserStore } from "~/stores/user";
 
-const userStore = useUserStore()
-const user = computed(() => userStore.user)
-
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 </script>
 
 <template>

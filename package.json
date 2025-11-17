@@ -8,7 +8,9 @@
     "dev": "nuxt dev --host 0.0.0.0 --port 3000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@instantdb/admin": "^0.22.49",
@@ -38,6 +40,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@iconify-json/ci": "^1.2.2"
+    "@iconify-json/ci": "^1.2.2",
+    "prettier": "^3.0.0"
   }
 }

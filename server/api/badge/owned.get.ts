@@ -1,4 +1,3 @@
-
 import db from "@/server/utils/db";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { sola_badge_contract_address } from "@/server/utils/solar_badge/contracts";

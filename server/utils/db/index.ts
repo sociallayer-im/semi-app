@@ -1,11 +1,11 @@
-import { init } from '@instantdb/admin';
-import schema from './instant.schema';
+import { init } from "@instantdb/admin";
+import schema from "./instant.schema";
 
 export function createDb(appId: string, adminToken: string) {
   return init({
     appId: appId,
     adminToken: adminToken,
-    schema
+    schema,
   });
 }
 
@@ -13,4 +13,4 @@ const db = createDb(process.env.INSTANT_APP_ID!, process.env.INSTANT_APP_ADMIN_T
 
 export type InstantDb = ReturnType<typeof createDb>;
 
-export default db
+export default db;

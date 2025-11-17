@@ -1,8 +1,5 @@
 import db from "@/server/utils/db";
-import {
-  keystoreToPrivateKey,
-  privateKeyToSafeAccount,
-} from "@/utils/encryption";
+import { keystoreToPrivateKey, privateKeyToSafeAccount } from "@/utils/encryption";
 import { predictSafeAccountAddress } from "@/utils/SafeSmartAccount";
 import { sepolia, mainnet, optimism } from "viem/chains";
 import { id } from "@instantdb/admin";
@@ -59,10 +56,7 @@ export default defineEventHandler(async (event) => {
 
   let eoa_address = "0x0000000000000000000000000000000000000000";
   try {
-    const private_key = await keystoreToPrivateKey(
-      JSON.parse(keystore_json),
-      pin_code
-    );
+    const private_key = await keystoreToPrivateKey(JSON.parse(keystore_json), pin_code);
     eoa_address = privateKeyToSafeAccount(private_key as `0x${string}`);
   } catch (error) {
     console.error(error);
@@ -105,34 +99,33 @@ export default defineEventHandler(async (event) => {
   // create badges
   try {
     const datebase_ids = Array.from({ length: receiver_addresses.length }, () => id());
-    const badge_ids = datebase_ids.map((badge_id, index) =>
-    {
-        console.log('badge_id =>', badge_id, receiver_addresses[index], chain.id);
-        return getBadgeId(badge_id, class_id, receiver_addresses[index] as `0x${string}`, chain.id);
-    }
-    );
+    const badge_ids = datebase_ids.map((badge_id, index) => {
+      console.log("badge_id =>", badge_id, receiver_addresses[index], chain.id);
+      return getBadgeId(badge_id, class_id, receiver_addresses[index] as `0x${string}`, chain.id);
+    });
 
-    console.log('datebase_ids', datebase_ids);
-    console.log('badge_ids', badge_ids);
+    console.log("datebase_ids", datebase_ids);
+    console.log("badge_ids", badge_ids);
 
-    await db.transact(datebase_ids.map((id, index) => {
+    await db.transact(
+      datebase_ids.map((id, index) => {
         const new_badge = {
-            badge_id: badge_ids[index],
-                class_id: class_id,
-                wallet_address: receiver_addresses[index],
-                chain_id: chain.id,
-                metadata: {
-                    badge_name,
-                    badge_description,
-                    badge_image_url,
-                },
-                created_at: new Date(),
-                status: "pending",
-        }
-        
-        return db.tx.badges[id].create(new_badge);
-    }))
+          badge_id: badge_ids[index],
+          class_id: class_id,
+          wallet_address: receiver_addresses[index],
+          chain_id: chain.id,
+          metadata: {
+            badge_name,
+            badge_description,
+            badge_image_url,
+          },
+          created_at: new Date(),
+          status: "pending",
+        };
 
+        return db.tx.badges[id].create(new_badge);
+      })
+    );
   } catch (error) {
     console.error(error);
     return {
