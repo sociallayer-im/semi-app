@@ -212,5 +212,7 @@
   "Send badges failed": "Send badges failed",
   "Create badge may take a few minutes to complete.": "Create badge may take a few minutes to complete.",
   "View in Explorer": "View in Explorer",
-  "Invalid passcode": "Invalid passcode"
+  "Invalid passcode": "Invalid passcode",
+  "Memo(optional)": "Memo(optional)",
+  "Please enter memo": "Please enter memo"
 }

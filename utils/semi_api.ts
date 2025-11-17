@@ -291,6 +291,7 @@ export interface TransactionRecord {
   status: string;
   chain: string;
   data: string; // TransactionReceipt 的 JSON 字符串
+  memo: string;
 }
 
 // 上传交易记录
@@ -305,11 +306,11 @@ export async function uploadTransaction(transaction: TransactionRecord): Promise
 
 // 获取交易记录
 export interface TransactionRecordResponse extends BaseResponse {
-  transactions: TransactionRecord[];
+    transactions: TransactionRecord[];
 }
 
-export async function getTransactions(): Promise<BaseResponse> {
-  const response = await fetch(`${API_BASE_URL}/get_transactions`, {
+export async function getTransactions(txhashes?:string): Promise<TransactionRecordResponse> {
+  const response = await fetch(`${API_BASE_URL}/get_transactions${txhashes ? `?tx_hashes=${txhashes}` : ""}`, {
     headers: getAuthHeaders(),
   });
 

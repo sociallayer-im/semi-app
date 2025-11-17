@@ -31,6 +31,7 @@ export interface ActionPreview {
   txHex: string;
   symbol?: string;
   decimals?: number;
+  memo?: string;
 }
 
 export function parseSendActions(history: any[]) {

@@ -212,5 +212,7 @@
   "Send badges failed": "发送徽章失败",
   "Create badge may take a few minutes to complete.": "创建徽章可能需要几分钟时间完成。",
   "View in Explorer": "区块浏览器",
-  "Invalid passcode": "密码错误"
+  "Invalid passcode": "密码错误",
+  "Memo(optional)": "备注(可选)",
+  "Please enter memo": "请输入备注"
 }

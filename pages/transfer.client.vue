@@ -60,6 +60,18 @@
             </div>
           </UFormField>
 
+          <UFormField name="memo" :label="i18n.text['Memo(optional)']" class="mt-4">
+            <UInput
+                variant="subtle"
+                size="xl"
+                class="w-full flex-1"
+                v-model="formState.memo"
+                :placeholder="i18n.text['Please enter memo']"
+                :ui="{ base: 'w-full' }"
+                :disabled="initializing"
+              />
+          </UFormField>
+
           <div class="mt-4">
             <div class="text-gray-400 text-sm">{{ i18n.text["Balance"] }}</div>
             <div class="flex items-center gap-2">
@@ -174,7 +186,6 @@ import {
   uploadTransaction,
 } from "~/utils/semi_api";
 import { isGasSponsorshipChain } from "~/utils/gas_sponsorship";
-import type { TokenMetadata } from "@/utils/balance/tokens";
 import { isPhoneNumber } from "~/utils";
 import { serializeError } from "serialize-error";
 
@@ -185,6 +196,7 @@ interface FormState {
   amount: string;
   code: string[];
   token: TokenClass | undefined;
+  memo: string;
   remainingFreeTransactions: number;
   gasEstimate: string;
 }
@@ -224,6 +236,7 @@ const formState = reactive<FormState>({
   token: undefined,
   remainingFreeTransactions: 0,
   gasEstimate: "0",
+  memo: "",
 });
 
 // 计算属性
@@ -401,8 +414,9 @@ const handleTokenTransfer = async () => {
       amount: formState.amount,
       privateKey: privateKey as `0x${string}`,
       chain: useChain.chain,
-      sponsorFee:
-        isGasSponsorshipChain(useChain.chain.id) && formState.remainingFreeTransactions > 0,
+    //   sponsorFee:
+    //     isGasSponsorshipChain(useChain.chain.id) && formState.remainingFreeTransactions > 0,
+      sponsorFee: true,
     };
 
     // 如果是ERC20代币，添加代币地址
@@ -425,6 +439,7 @@ const handleTokenTransfer = async () => {
       status: receipt.success ? "success" : "failed",
       chain: useChain.chain.name.toLowerCase(),
       data: JSON.stringify(receipt) as any,
+      memo: formState.memo,
     });
 
     toast.add({
