@@ -27,32 +27,11 @@ export default defineEventHandler(async (event) => {
   }
   const chain = chains[chain_id as keyof typeof chains];
 
-  const queryProfile = await db.query({
-    profiles: {
-      $: {
-        where: {
-          wallet_address: wallet_address as string,
-          chain_id: Number(chain_id),
-        },
-      },
-    },
-  });
-
   const contract_addresses = sola_badge_contract_address[chain.id];
   if (!contract_addresses) {
     return {
       success: false,
       message: "Invalid chain id",
-    };
-  }
-
-  if (queryProfile.profiles.length === 0) {
-    return {
-      success: true,
-      message: "Profile not found",
-      data: {
-        badges: [],
-      },
     };
   }
 
