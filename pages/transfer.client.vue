@@ -414,9 +414,7 @@ const handleTokenTransfer = async () => {
       amount: formState.amount,
       privateKey: privateKey as `0x${string}`,
       chain: useChain.chain,
-    //   sponsorFee:
-    //     isGasSponsorshipChain(useChain.chain.id) && formState.remainingFreeTransactions > 0,
-      sponsorFee: true,
+      sponsorFee: isGasSponsorshipChain(useChain.chain.id) && formState.remainingFreeTransactions > 0,
     };
 
     // 如果是ERC20代币，添加代币地址
