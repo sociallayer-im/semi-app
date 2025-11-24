@@ -56,7 +56,7 @@
     <UModal v-model:open="showAddModal" :title="i18n.text['Add Contact']">
       <template #body>
         <UForm :state="formState" @submit="handleSubmit" class="w-full">
-          <UFormField name="memo" :label="i18n.text['Memo(optional)']" :error="errors.memo">
+          <UFormField name="memo" :label="i18n.text['Memo']" :error="errors.memo">
             <UInput v-model="formState.memo" :placeholder="i18n.text['Please enter memo']" variant="subtle" size="xl"
               class="w-full" />
           </UFormField>
