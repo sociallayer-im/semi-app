@@ -21,6 +21,7 @@
                 size="xl"
                 class="w-full"
                 variant="subtle"
+                :rows="5"
                 v-model="formState.to"
                 :placeholder="i18n.text['Please enter recipient address/phone number']"
                 :ui="{ base: 'w-full' }"
@@ -37,6 +38,7 @@
                 >
                 </UButton>
                 <ScanQrcodeBtn @onDetect="handleQrCodeDetect" />
+                <ContactsButton @onSelect="handleContactSelect" />
               </div>
             </div>
           </UFormField>
@@ -171,7 +173,6 @@
 </template>
 
 <script setup lang="ts">
-import { POPULAR_ERC20_TOKENS } from "@/utils/balance/tokens";
 import { useChainStore, chainMap } from "@/stores/chain";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
@@ -559,6 +560,13 @@ const handleQrCodeDetect = (values: string[]) => {
         i18n.text["Scanned QR code is not a valid Ethereum address"]
       );
     }
+  }
+};
+
+// 处理联系人选择
+const handleContactSelect = (address: string) => {
+  if (isAddress(address)) {
+    formState.to = address;
   }
 };
 
