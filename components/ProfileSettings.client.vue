@@ -10,12 +10,7 @@
         label: i18n.text['Logout'],
         icon: 'i-ci-log-out',
         onSelect: handleLogout,
-      },
-      {
-        label: i18n.text['Contacts'],
-        icon: 'ci:notebook',
-        onSelect: () => router.push('/contacts'),
-      },
+      }
     ]"
   >
     <UIcon name="ci:settings" size="24" class="cursor-pointer hover:text-primary-500" />

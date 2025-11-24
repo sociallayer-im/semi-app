@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col container-size h-[100vh] rounded-xl bg-[var(--ui-bg)] shadow-lg px-4 py-6 banner"
-  >
+  <div class="flex flex-col container-size h-[100vh] rounded-xl bg-[var(--ui-bg)] shadow-lg px-4 py-6 banner">
     <!-- 顶部账户信息 -->
     <div class="w-full flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
@@ -9,7 +7,10 @@
 
         <AddressDisplay :address="data.safeAddress" />
       </div>
-      <ProfileSettings />
+      <div class="flex items-center gap-4">
+        <UIcon name="ci:notebook" size="26" class="cursor-pointer hover:text-primary-500" @click="navigateTo('/contacts')" />
+        <ProfileSettings />
+      </div>
     </div>
 
     <!-- 操作按钮 -->
@@ -54,10 +55,8 @@
     <!-- 资产列表 -->
     <div class="flex flex-col flex-1 overflow-y-auto" v-else>
       <!-- 主链资产 -->
-      <div
-        class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-        @click="navigateTo('/transfer')"
-      >
+      <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
+        @click="navigateTo('/transfer')">
         <div class="flex items-center gap-3">
           <img :src="'/images/eth_logo.png'" class="w-10 h-10 rounded-full" alt="eth" />
           <div>
@@ -73,18 +72,11 @@
       </div>
 
       <!-- 代币资产 -->
-      <div
-        class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
-        v-for="balance in balances"
-        @click="navigateTo(`/transfer?token_address=${balance.token.address}`)"
-        :key="balance.token.address"
-      >
+      <div class="w-full flex items-center justify-between mb-4 hover:bg-muted rounded-md py-2 px-4 cursor-pointer"
+        v-for="balance in balances" @click="navigateTo(`/transfer?token_address=${balance.token.address}`)"
+        :key="balance.token.address">
         <div class="flex items-center gap-3">
-          <img
-            :src="balance.token.image_url"
-            class="w-10 h-10 rounded-full"
-            :alt="balance.token.symbol"
-          />
+          <img :src="balance.token.image_url" class="w-10 h-10 rounded-full" :alt="balance.token.symbol" />
           <div>
             <div class="font-medium">{{ balance.token.symbol }}</div>
             <div class="text-gray-400 text-sm">{{ balance.token.name }}</div>
