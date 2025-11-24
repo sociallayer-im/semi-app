@@ -34,9 +34,9 @@
             class="w-full flex items-center justify-between p-2 px-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors cursor-pointer"
             @click="handleSelectContact(contact)"
           >
-            <div class="flex flex-col flex-1 max-w-[80%]">
+            <div class="flex flex-col flex-1 gap-1">
               <!-- 第一行：memo -->
-              <div class="font-medium text-base mb-2">{{ contact.memo || "-" }}</div>
+              <div class="font-medium text-base  break-all">{{ contact.memo || "-" }}</div>
               <!-- 第二行：chain icon 和 address -->
               <div class="flex items-center gap-2">
                 <img
@@ -45,7 +45,7 @@
                   class="w-5 h-5 rounded-full"
                   @error="handleImageError"
                 />
-                <span class="text-sm text-gray-400 font-mono">{{ contact.address }}</span>
+                <span class="text-sm text-gray-400 font-mono break-all">{{ contact.address }}</span>
               </div>
             </div>
           </div>

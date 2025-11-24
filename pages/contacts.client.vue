@@ -29,23 +29,23 @@
     <!-- 联系人列表 -->
     <div class="flex flex-col gap-3 flex-1 overflow-y-auto" v-else>
       <div v-for="(contact, index) in contacts" :key="index"
-        class="w-full flex justify-between py-2 px-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
-        <div class="flex flex-col flex-1  max-w-[80%]">
+        class="w-full flex justify-between gap-2 py-2 px-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
+        <div class="flex flex-col flex-1 gap-1">
           <!-- 第一行：memo -->
-          <div class="font-medium text-base mb-2">{{ contact.memo || "-" }}</div>
+          <div class="font-medium text-base">{{ contact.memo || "-" }}</div>
           <!-- 第二行：chain icon 和 address -->
           <div class="flex items-center gap-2">
             <img :src="getChainIcon(contact.chain)" :alt="contact.chain" class="w-5 h-5 rounded-full"
               @error="handleImageError" />
-            <span class="text-sm text-gray-400 font-mono">{{ contact.address }}</span>
+            <span class="text-sm text-gray-400 font-mono break-all">{{ contact.address }}</span>
           </div>
         </div>
         <!-- 删除按钮 -->
         <div class="flex flex-col gap-2">
-          <UButton color="error" variant="outline"  size="sm" @click.stop="handleDeleteClick(index)" class="text-sm px-2">
+          <UButton color="error" variant="outline"  size="sm" @click.stop="handleDeleteClick(index)" class="text-sm px-2 py-2">
            <UIcon name="ci:trash-full" size="18" />
           </UButton>
-          <UButton  variant="outline"  size="sm" @click.stop="navigateTo(`/transfer?to=${contact.address}`)" class="text-sm px-2">
+          <UButton  variant="outline"  size="sm" @click.stop="navigateTo(`/transfer?to=${contact.address}`)" class="text-sm px-2 py-2">
             <UIcon name="ci:transfer" size="18" />
           </UButton>
         </div>
