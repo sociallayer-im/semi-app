@@ -42,10 +42,12 @@
         </div>
         <!-- 删除按钮 -->
         <div class="flex flex-col gap-2">
-          <UButton color="error" variant="outline"  size="sm" @click.stop="handleDeleteClick(index)" class="text-sm px-2 py-2">
-           <UIcon name="ci:trash-full" size="18" />
+          <UButton color="error" variant="outline" size="sm" @click.stop="handleDeleteClick(index)"
+            class="text-sm px-2 py-2">
+            <UIcon name="ci:trash-full" size="18" />
           </UButton>
-          <UButton  variant="outline"  size="sm" @click.stop="navigateTo(`/transfer?to=${contact.address}`)" class="text-sm px-2 py-2">
+          <UButton variant="outline" size="sm" @click.stop="navigateTo(`/transfer?to=${contact.address}`)"
+            class="text-sm px-2 py-2">
             <UIcon name="ci:transfer" size="18" />
           </UButton>
         </div>
@@ -61,10 +63,13 @@
               class="w-full" />
           </UFormField>
 
-          <UFormField name="address" :label="i18n.text['Address']" :error="errors.address" class="mt-4">
-            <UInput v-model="formState.address" :placeholder="i18n.text['Please enter address']" variant="subtle"
-              size="xl" class="w-full" />
-          </UFormField>
+          <div class="flex items-end gap-2">
+            <UFormField name="address" :label="i18n.text['Address']" :error="errors.address" class="mt-4 flex-1">
+              <UInput v-model="formState.address" :placeholder="i18n.text['Please enter address']" variant="subtle"
+                size="xl" class="w-full" />
+            </UFormField>
+            <ScanQrcodeBtn @onDetect="handleQrCodeDetect" />
+          </div>
 
           <UFormField name="chain" :label="i18n.text['Chain']" :error="errors.chain" class="mt-4">
             <USelect v-model="formState.chain" :items="chainSelectItems" variant="subtle" size="xl" class="w-full"
@@ -359,6 +364,15 @@ const handleDeleteConfirm = async () => {
     });
   } finally {
     deleting.value = false;
+  }
+};
+
+const handleQrCodeDetect = (values: string[]) => {
+  if (values.length > 0) {
+    const address = values[0];
+    if (isAddress(address)) {
+      formState.address = address;
+    }
   }
 };
 
